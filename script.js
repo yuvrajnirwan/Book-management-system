@@ -9,63 +9,123 @@ const editBtn = document.querySelector("#editBtn");
 const table = document.querySelector(".libraryTable");
 const books = [];
 const currDate=new Date();
+
 function handleSubmit(event) {
-   
     event.preventDefault();
 
-    if (bookName.value == "" || authorName.value == "" || isbnNumber.value == "" || publishDate.value == "" || genre.value == "") {
+    if (bookName.value === "" || authorName.value === "" || isbnNumber.value === "" || publishDate.value === "" || genre.value === "") {
         alert("Please fill all the fields");
-    } else {
-          
-        const bookAge= currDate.getFullYear()-new Date(publishDate.value).getFullYear();
-        const newBook = {
-            id: books.length + 1, 
-            title: bookName.value,
-            author: authorName.value,
-            isbn: isbnNumber.value,
-            publishDate: publishDate.value,
-            age:bookAge,
-            genre: genre.value
-        };
-
-        books.push(newBook);
-        console.log("Book Added:", newBook);
-        console.log("All books:", books);
-         const newRow= document.createElement("tr");
-         newRow.innerHTML=`<td>${newBook.id}</td><td>${newBook.title}</td><td>${newBook.author}</td><td>${newBook.isbn}</td><td>${newBook.publishDate}</td><td>${newBook.age}</td><td>${newBook.genre}</td>`;
-table.appendChild(newRow);
- alert("Book added successfully!");
- form.reset();
+        return;
     }
+
+    const bookAge = currDate.getFullYear() - new Date(publishDate.value).getFullYear();
+    const newBook = {
+        id: books.length + 1,
+        title: bookName.value,
+        author: authorName.value,
+        isbn: isbnNumber.value,
+        publishDate: publishDate.value,
+        age: bookAge,
+        genre: genre.value
+    };
+
+    // create row first so we can reference it in the button handlers
+    const newRow = document.createElement("tr");
+    newRow.innerHTML =
+        `<td>${newBook.id}</td>` +
+        `<td>${newBook.title}</td>` +
+        `<td>${newBook.author}</td>` +
+        `<td>${newBook.isbn}</td>` +
+        `<td>${newBook.publishDate}</td>` +
+        `<td>${newBook.age}</td>` +
+        `<td>${newBook.genre}</td>` +
+        `<td class="edit"></td><td class="delete"></td>`;
+
+    const rowEditBtn = document.createElement("button");
+    rowEditBtn.textContent = "Edit";
+    rowEditBtn.addEventListener("click", () => editBook(newBook.id));
+
+    const rowDeleteBtn = document.createElement("button");
+    rowDeleteBtn.textContent = "Delete";
+    rowDeleteBtn.addEventListener("click", () => deleteBook(newBook.id));
+
+    newRow.querySelector("td.edit").appendChild(rowEditBtn);
+    newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
+
+    books.push(newBook);
+    table.appendChild(newRow);
+
+    console.log("Book Added:", newBook);
+    console.log("All books:", books);
+
+    alert("Book added successfully!");
+    form.reset();
 }
 
-function editBook(){
-    if (books.length === 0) {
-        alert("No books to edit!");
+function editBook(id) {
+    if (id == null) {
+        if (books.length === 0) {
+            alert("No books to edit!");
+            return;
+        }
+        const findId = prompt("Enter the book ID to edit Book title:");
+        id = parseInt(findId, 10);
     }
-    else{
-       const findId = prompt("Enter the book ID to edit Book title:");
-        for(let i=0;i<books.length;i++){
-            if(findId==books[i].id){
-                alert("Book found! " + books[i].title);
-                const newName=prompt("Enter the new name of the book:");
-                books[i].title=newName;
-                alert("Book name updated successfully!");
-                
+
+    const book = books.find(b => b.id === id);
+    if (!book) {
+        alert("Book not found.");
+        return;
+    }
+
+    const newName = prompt("Enter the new name of the book:", book.title);
+    if (newName) {
+        book.title = newName;
+        const rows = table.querySelectorAll("tr");
+        for (let i = 1; i < rows.length; i++) {
+            const cell = rows[i].children[0];
+            if (parseInt(cell.textContent, 10) === id) {
+                rows[i].children[1].textContent = newName;
+                break;
             }
         }
+        alert("Book name updated successfully!");
+        console.log("All books:", books);
     }
 }
-function deleteBook(){
-    if (books.length ==0) {
-        alert("No books to delete!");
+
+function deleteBook(id) {
+    if (id == null) {
+        if (books.length === 0) {
+            alert("No books to delete!");
+            return;
+        }
+        books.pop();
+        const lastDataRow = table.querySelector("tr:last-child");
+        if (lastDataRow) lastDataRow.remove();
+        alert("Last book deleted successfully!");
+        console.log("All books:", books);
+        return;
     }
-    else{
-    books.pop();
-    alert("Last book deleted successfully!");
+
+    const index = books.findIndex(b => b.id === id);
+    if (index === -1) {
+        alert("Book not found.");
+        return;
+    }
+    books.splice(index, 1);
+    const rows = table.querySelectorAll("tr");
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].children[0];
+        if (parseInt(cell.textContent, 10) === id) {
+            rows[i].remove();
+            break;
+        }
+    }
+    alert("Book deleted successfully!");
     console.log("All books:", books);
-    }
 }
+
 form.addEventListener("submit", handleSubmit);
-deleteBtn.addEventListener("click", deleteBook);
-editBtn.addEventListener("click", editBook);
+deleteBtn.addEventListener("click", () => deleteBook());
+editBtn.addEventListener("click", () => editBook());
