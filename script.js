@@ -4,8 +4,6 @@ const authorName = document.querySelector("#authorName");
 const isbnNumber = document.querySelector("#isbnNumber");
 const publishDate = document.querySelector("#publishDate");
 const genre = document.querySelector("#genreInput");
-const deleteBtn = document.querySelector("#deleteBtn");
-const editBtn = document.querySelector("#editBtn");
 const table = document.querySelector(".libraryTable");
 const books = [];
 const currDate=new Date();
@@ -28,8 +26,6 @@ function handleSubmit(event) {
         age: bookAge,
         genre: genre.value
     };
-
-    // create row first so we can reference it in the button handlers
     const newRow = document.createElement("tr");
     newRow.innerHTML =
         `<td>${newBook.id}</td>` +
@@ -63,34 +59,15 @@ function handleSubmit(event) {
 }
 
 function editBook(id) {
-    if (id == null) {
-        if (books.length === 0) {
-            alert("No books to edit!");
-            return;
+     const rows = table.querySelectorAll("tr");
+     for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].children[0];
+        if (parseInt(cell.textContent, 10) === id) {
+            rows[i].setAttribute("contenteditable", "true");
+            rows[i].children[0].setAttribute("contenteditable","false");
+            rows[i].children[5].setAttribute("contenteditable","false");
+            break;
         }
-        const findId = prompt("Enter the book ID to edit Book title:");
-        id = parseInt(findId, 10);
-    }
-
-    const book = books.find(b => b.id === id);
-    if (!book) {
-        alert("Book not found.");
-        return;
-    }
-
-    const newName = prompt("Enter the new name of the book:", book.title);
-    if (newName) {
-        book.title = newName;
-        const rows = table.querySelectorAll("tr");
-        for (let i = 1; i < rows.length; i++) {
-            const cell = rows[i].children[0];
-            if (parseInt(cell.textContent, 10) === id) {
-                rows[i].children[1].textContent = newName;
-                break;
-            }
-        }
-        alert("Book name updated successfully!");
-        console.log("All books:", books);
     }
 }
 
