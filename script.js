@@ -57,6 +57,7 @@ function handleSubmit(event) {
 
     alert("Book added successfully!");
     form.reset();
+    filterBooks();
 }
 
 function editBook(id) {
@@ -89,6 +90,7 @@ function deleteBook(id) {
     }
     alert("Book deleted successfully!");
     console.log("All books:", books);
+    filterBooks();
 }
 
 function handleSaveEdit(){
@@ -109,7 +111,7 @@ function handleSaveEdit(){
             alert("Details updated successfully!");
             console.log("Updated Book:", updatedBook);
 
-            const index = books.findIndex(b => b.id === id);
+            const index = books.findIndex(book => book.id === id);
             if (index !== -1) {
                 books[index] = updatedBook;
                 console.log("All books:", books);
@@ -118,7 +120,25 @@ function handleSaveEdit(){
             rows[i].setAttribute("contenteditable", "false");
         }
     }
-
 }
+function filterBooks(){
+    const rows = table.querySelectorAll("tr");
+    const filtered = document.querySelector("#genreSelect").value.toLowerCase();
+    for(let i = 1; i < rows.length; i++){
+        const genreCell = rows[i].children[6].textContent.toLowerCase();
+        if(filtered === "all" || genreCell === filtered){
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
+
 form.addEventListener("submit", handleSubmit);
 saveEdit.addEventListener("click", () => handleSaveEdit());
+
+const genreSelect = document.querySelector("#genreSelect");
+if (genreSelect) {
+    genreSelect.addEventListener("change", filterBooks);
+}
+filterBooks();
