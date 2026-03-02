@@ -5,6 +5,7 @@ const isbnNumber = document.querySelector("#isbnNumber");
 const publishDate = document.querySelector("#publishDate");
 const genre = document.querySelector("#genreInput");
 const table = document.querySelector(".libraryTable");
+const saveEdit = document.querySelector("#saveEdit");
 const books = [];
 const currDate=new Date();
 
@@ -72,19 +73,6 @@ function editBook(id) {
 }
 
 function deleteBook(id) {
-    if (id == null) {
-        if (books.length === 0) {
-            alert("No books to delete!");
-            return;
-        }
-        books.pop();
-        const lastDataRow = table.querySelector("tr:last-child");
-        if (lastDataRow) lastDataRow.remove();
-        alert("Last book deleted successfully!");
-        console.log("All books:", books);
-        return;
-    }
-
     const index = books.findIndex(b => b.id === id);
     if (index === -1) {
         alert("Book not found.");
@@ -103,6 +91,34 @@ function deleteBook(id) {
     console.log("All books:", books);
 }
 
+function handleSaveEdit(){
+    const rows = table.querySelectorAll("tr");
+    for (let i = 1; i < rows.length; i++) {
+        if (rows[i].getAttribute("contenteditable") === "true") {
+            const id = parseInt(rows[i].children[0].textContent, 10);
+            const title = rows[i].children[1].textContent;
+            const author = rows[i].children[2].textContent;
+            const isbn = rows[i].children[3].textContent;
+            const publishDateText = rows[i].children[4].textContent;
+            const age = currDate.getFullYear() - new Date(publishDateText).getFullYear();
+            const genreText = rows[i].children[6].textContent;
+
+            rows[i].children[5].textContent = age;
+
+            const updatedBook = { id, title, author, isbn, publishDate: publishDateText, age, genre: genreText };
+            alert("Details updated successfully!");
+            console.log("Updated Book:", updatedBook);
+
+            const index = books.findIndex(b => b.id === id);
+            if (index !== -1) {
+                books[index] = updatedBook;
+                console.log("All books:", books);
+            }
+
+            rows[i].setAttribute("contenteditable", "false");
+        }
+    }
+
+}
 form.addEventListener("submit", handleSubmit);
-deleteBtn.addEventListener("click", () => deleteBook());
-editBtn.addEventListener("click", () => editBook());
+saveEdit.addEventListener("click", () => handleSaveEdit());
