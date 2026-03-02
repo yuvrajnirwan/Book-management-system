@@ -68,6 +68,8 @@ function editBook(id) {
             rows[i].setAttribute("contenteditable", "true");
             rows[i].children[0].setAttribute("contenteditable","false");
             rows[i].children[5].setAttribute("contenteditable","false");
+             rows[i].children[7].setAttribute("contenteditable","false");
+            rows[i].children[8].setAttribute("contenteditable","false");
             break;
         }
     }
