@@ -18,45 +18,19 @@ function handleSubmit(event) {
     }
 
     const bookAge = currDate.getFullYear() - new Date(publishDate.value).getFullYear();
-    const newBook = {
-        id: books.length + 1,
-        title: bookName.value,
-        author: authorName.value,
-        isbn: isbnNumber.value,
-        publishDate: publishDate.value,
-        age: bookAge,
-        genre: genre.value
-    };
-
-    const newRow = document.createElement("tr");
-    newRow.innerHTML =
-        `<td>${newBook.id}</td>` +
-        `<td>${newBook.title}</td>` +
-        `<td>${newBook.author}</td>` +
-        `<td>${newBook.isbn}</td>` +
-        `<td>${newBook.publishDate}</td>` +
-        `<td>${newBook.age}</td>` +
-        `<td>${newBook.genre}</td>` +
-        `<td class="edit"></td><td class="delete"></td>`;
-
-    const rowEditBtn = document.createElement("button");
-    rowEditBtn.textContent = "Edit";
-    rowEditBtn.addEventListener("click", () => editBook(newBook.id));
-
-    const rowDeleteBtn = document.createElement("button");
-    rowDeleteBtn.textContent = "Delete";
-    rowDeleteBtn.addEventListener("click", () => deleteBook(newBook.id));
-
-    newRow.querySelector("td.edit").appendChild(rowEditBtn);
-    newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
 
     const fetchPromise = () => {
         return new Promise((resolve, reject) => {
             fetch('https://jsonplaceholder.typicode.com/posts', {
   method: 'POST',
   body: JSON.stringify({
-    title: 'Yuvraj Chauhan',
-    userId: 1,
+     id: books.length + 1,
+        title: bookName.value,
+        author: authorName.value,
+        isbn: isbnNumber.value,
+        publishDate: publishDate.value,
+        age: bookAge,
+        genre: genre.value
   }),
   headers: {
     'Content-type': 'application/json; charset=UTF-8',
@@ -65,12 +39,34 @@ function handleSubmit(event) {
   .then((response) => response.json())
   .then((json) => {
         console.log("API Response:", json);
-        const apiTitle = json.title;
         return new Promise((resolve,reject)=>{
             setTimeout(()=>{
-                books.push(newBook);
+        
+                const newRow = document.createElement("tr");
+                newRow.innerHTML =
+                    `<td>${json.id}</td>` +
+                    `<td>${json.title}</td>` +
+                    `<td>${json.author}</td>` +
+                    `<td>${json.isbn}</td>` +
+                    `<td>${json.publishDate}</td>` +
+                    `<td>${json.age}</td>` +
+                    `<td>${json.genre}</td>` +
+                    `<td class="edit"></td><td class="delete"></td>`;
+
+                const rowEditBtn = document.createElement("button");
+                rowEditBtn.textContent = "Edit";
+                rowEditBtn.addEventListener("click", () => editBook(json.id));
+
+                const rowDeleteBtn = document.createElement("button");
+                rowDeleteBtn.textContent = "Delete";
+                rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
+
+                newRow.querySelector("td.edit").appendChild(rowEditBtn);
+                newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
+
+                books.push(json);
                 table.appendChild(newRow);
-                console.log("Book Added:", newBook);
+                console.log("Book Added:", json);
                 console.log("All books:", books);
                 form.reset();
                 filterBooks();
@@ -78,7 +74,6 @@ function handleSubmit(event) {
                 
                 alert("Book saved successfully!");
             }, 3000);
-            alert("Hey!! "+apiTitle+" your book is being saved, please wait for 3 seconds...");
         });
     })
     .then((result) => {
@@ -89,7 +84,6 @@ function handleSubmit(event) {
     });
         });
     };
-
     fetchPromise();
 }
 
