@@ -27,6 +27,7 @@ function handleSubmit(event) {
         age: bookAge,
         genre: genre.value
     };
+
     const newRow = document.createElement("tr");
     newRow.innerHTML =
         `<td>${newBook.id}</td>` +
@@ -49,15 +50,19 @@ function handleSubmit(event) {
     newRow.querySelector("td.edit").appendChild(rowEditBtn);
     newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
 
-    books.push(newBook);
-    table.appendChild(newRow);
-
-    console.log("Book Added:", newBook);
-    console.log("All books:", books);
-
-    alert("Book added successfully!");
-    form.reset();
-    filterBooks();
+ return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            books.push(newBook);
+            table.appendChild(newRow);
+            console.log("Book Added:", newBook);
+            console.log("All books:", books);
+            alert("Book added successfully!");
+            form.reset();
+            resolve();
+        }, 3000);
+        filterBooks();
+    });
+    
 }
 
 function editBook(id) {
