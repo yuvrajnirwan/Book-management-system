@@ -40,40 +40,43 @@ function handleSubmit(event) {
   .then((json) => {
         console.log("API Response:", json);
         return new Promise((resolve,reject)=>{
-            setTimeout(()=>{
+            
+                setTimeout(()=>{
         
-                const newRow = document.createElement("tr");
-                newRow.innerHTML =
-                    `<td>${json.id}</td>` +
-                    `<td>${json.title}</td>` +
-                    `<td>${json.author}</td>` +
-                    `<td>${json.isbn}</td>` +
-                    `<td>${json.publishDate}</td>` +
-                    `<td>${json.age}</td>` +
-                    `<td>${json.genre}</td>` +
-                    `<td class="edit"></td><td class="delete"></td>`;
+                    const newRow = document.createElement("tr");
+                    newRow.innerHTML =
+                        `<td>${json.id}</td>` +
+                        `<td>${json.title}</td>` +
+                        `<td>${json.author}</td>` +
+                        `<td>${json.isbn}</td>` +
+                        `<td>${json.publishDate}</td>` +
+                        `<td>${json.age}</td>` +
+                        `<td>${json.genre}</td>` +
+                        `<td class="edit"></td><td class="delete"></td>`;
+  
 
-                const rowEditBtn = document.createElement("button");
-                rowEditBtn.textContent = "Edit";
-                rowEditBtn.addEventListener("click", () => editBook(json.id));
+                    const rowEditBtn = document.createElement("button");
+                    rowEditBtn.textContent = "Edit";
+                    rowEditBtn.addEventListener("click", () => editBook(json.id));
 
-                const rowDeleteBtn = document.createElement("button");
-                rowDeleteBtn.textContent = "Delete";
-                rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
+                    const rowDeleteBtn = document.createElement("button");
+                    rowDeleteBtn.textContent = "Delete";
+                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
 
-                newRow.querySelector("td.edit").appendChild(rowEditBtn);
-                newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
+                    newRow.querySelector("td.edit").appendChild(rowEditBtn);
+                    newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
 
-                books.push(json);
-                table.appendChild(newRow);
-                console.log("Book Added:", json);
-                console.log("All books:", books);
-                form.reset();
-                filterBooks();
-                resolve("Book saved");
-                
-                alert("Book saved successfully!");
-            }, 3000);
+                    books.push(json);
+                    table.appendChild(newRow);
+                    console.log("Book Added:", json);
+                    console.log("All books:", books);
+                    form.reset();
+                    filterBooks();
+                    resolve("Book saved");
+                    
+                    alert("Book saved successfully!");
+                }, 3000);
+            
         });
     })
     .then((result) => {
