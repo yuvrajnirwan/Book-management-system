@@ -50,19 +50,47 @@ function handleSubmit(event) {
     newRow.querySelector("td.edit").appendChild(rowEditBtn);
     newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
 
- return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
-            books.push(newBook);
-            table.appendChild(newRow);
-            console.log("Book Added:", newBook);
-            console.log("All books:", books);
-            alert("Book added successfully!");
-            form.reset();
-            resolve();
-        }, 3000);
-        filterBooks();
+    const fetchPromise = () => {
+        return new Promise((resolve, reject) => {
+            fetch('https://jsonplaceholder.typicode.com/posts', {
+  method: 'POST',
+  body: JSON.stringify({
+    title: 'Yuvraj Chauhan',
+    userId: 1,
+  }),
+  headers: {
+    'Content-type': 'application/json; charset=UTF-8',
+  },
+})
+  .then((response) => response.json())
+  .then((json) => {
+        console.log("API Response:", json);
+        const apiTitle = json.title;
+        return new Promise((resolve,reject)=>{
+            setTimeout(()=>{
+                books.push(newBook);
+                table.appendChild(newRow);
+                console.log("Book Added:", newBook);
+                console.log("All books:", books);
+                form.reset();
+                filterBooks();
+                resolve("Book saved");
+                
+                alert("Book saved successfully!");
+            }, 3000);
+            alert("Hey!! "+apiTitle+" your book is being saved, please wait for 3 seconds...");
+        });
+    })
+    .then((result) => {
+        resolve(result);
+    })
+    .catch((error) => {
+        reject(error);
     });
-    
+        });
+    };
+
+    fetchPromise();
 }
 
 function editBook(id) {
