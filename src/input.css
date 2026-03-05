@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@tailwind utilities;
+/* Now write your custom classes using @apply */
+.bookSubmitForm{
+  @apply shadow-md rounded-lg p-6 border border-gray-200 text-black; 
+  
+}
+.inputBox{
+    @apply border border-amber-200 ;
+}
+
+.form-wrapper{
+    @apply flex justify-center items-center min-w-screen; 
+}
+
+h1{
+ @apply text-5xl justify-center text-center font-bold text-gray-800 mb-6;
+}
+
+th{
+    @apply m-2 p-2;
+}
+#addToLibary{
+    @apply border border-black w-3xl;
+    
+}
+#saveEdit{
+    @apply border border-black w-3xl pt-4;
+    @apply justify-center text-center;
+    @apply bg-green-500 text-white font-bold py-2 px-4 rounded;
+}
+h2{
+    @apply text-2xl font-bold;
+    @apply justify-center text-center pt-4;
+}
+tr{
+    @apply border border-gray-200;
+}
