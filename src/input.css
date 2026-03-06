@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @tailwind utilities;
-/* Now write your custom classes using @apply */
+
 .bookSubmitForm{
-  @apply shadow-md rounded-lg p-6 border border-gray-200 text-black; 
+  @apply lg:shadow-md rounded-lg p-0.5 m-0.5 border border-gray-200 text-black min-h-full items-center justify-center; ; 
   
 }
 .inputBox{
@@ -10,29 +10,53 @@
 }
 
 .form-wrapper{
-    @apply flex justify-center items-center min-w-screen; 
-}
+    @apply lg:flex  sm:flex-col ml-2 ; 
+    @apply lg:flex flex-row ;
+    
 
+
+}
+#genreSelect{
+    @apply border border-black ;
+}
+.libraryContainer{
+    @apply  m-2;
+}
+.edit{
+    @apply lg:border border-gray-200 bg-blue-500 text-white font-bold py-2 px-4 rounded;
+}
+.delete{
+    @apply lg:border border-gray-200 bg-red-500 text-white font-bold py-2 px-4 rounded;
+}
+.formContainer{
+    @apply lg:flex justify-center items-center max-h-full; 
+}
 h1{
- @apply text-5xl justify-center text-center font-bold text-gray-800 mb-6;
+ @apply lg:text-3xl justify-center text-center font-bold text-gray-800 mb-6 sm:text-[14px] text-left  ;
 }
 
 th{
-    @apply m-2 p-2;
+    @apply m-2 p-2 border border-gray-200;
 }
-#addToLibary{
-    @apply border border-black w-3xl;
+.addToLibrary{
+    @apply border border-black bg-green-500 w-xl rounded;
     
 }
 #saveEdit{
-    @apply border border-black w-3xl pt-4;
-    @apply justify-center text-center;
-    @apply bg-green-500 text-white font-bold py-2 px-4 rounded;
+    @apply lg:border border-black w-3xl mt-3.5;
+    @apply lg:justify-center text-center;
+    @apply lg:bg-green-500 text-white font-bold py-2 px-4 w-full rounded; 
+}
+td{
+    @apply m-1 p-1 border border-gray-200;
 }
 h2{
-    @apply text-2xl font-bold;
-    @apply justify-center text-center pt-4;
+    @apply lg:text-2xl font-bold;
+    @apply lg:justify-center text-center;
 }
 tr{
-    @apply border border-gray-200;
+    @apply border border-black;
+}
+.libraryTable{
+    @apply mt-5;
 }

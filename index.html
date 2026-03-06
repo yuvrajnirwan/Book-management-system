@@ -34,10 +34,12 @@
             <input type="text" name="genre" id="genreInput" placeholder="Ex. Sci-fi, fiction" class="inputBox">
             <br>
             <br>
-            <input type="submit" id="addToLibrary">
+            <input type="submit" class="addToLibrary">
         </form>
-    <div>
+        </div>
+    <div class="libraryContainer">
         <h2>Library</h2>
+        <hr>
         <table class="libraryTable">
             <tr>
                 <th>Book ID</th>
@@ -57,13 +59,13 @@
         <option value="horror" >Horror</option>
         <option value="mystery">Mystery</option>
       </select></th>
-                <th class="edit">Edit</th>
-                <th class="delete">Delete</th>
+                <th class="editRow">Edit</th>
+                <th class="deleteRow">Delete</th>
             </tr>
         </table>
         <button id="saveEdit">Save Changes</button>
     </div>
-    </div>
+    
     <script src="script.js"></script>
     </script>
 </body>

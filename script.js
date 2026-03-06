@@ -61,7 +61,8 @@ function handleSubmit(event) {
 
                     const rowDeleteBtn = document.createElement("button");
                     rowDeleteBtn.textContent = "Delete";
-                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
+                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id),
+                alert("Book deleted successfully!"));
 
                     newRow.querySelector("td.edit").appendChild(rowEditBtn);
                     newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
