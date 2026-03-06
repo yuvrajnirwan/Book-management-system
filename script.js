@@ -61,8 +61,7 @@ function handleSubmit(event) {
 
                     const rowDeleteBtn = document.createElement("button");
                     rowDeleteBtn.textContent = "Delete";
-                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id),
-                alert("Book deleted successfully!"));
+                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
 
                     newRow.querySelector("td.edit").appendChild(rowEditBtn);
                     newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
@@ -92,6 +91,7 @@ function handleSubmit(event) {
 }
 
 function editBook(id) {
+    alert("Press Save changes button after editing details")
      const rows = table.querySelectorAll("tr");
      for (let i = 1; i < rows.length; i++) {
         const cell = rows[i].children[0];
