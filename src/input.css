@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 .formContainer {
-  @apply flex flex-col w-full p-2 gap-8;
+  @apply flex flex-col w-3xl p-2 gap-8;
 
-  @apply lg:flex-row lg:items-start lg:p-10 lg:gap-12;
+  @apply lg:flex-row lg:items-start lg:p-2 lg:gap-12;
 }
 .bookSubmitForm, .libraryContainer {
   @apply w-full;
@@ -11,7 +11,7 @@
 
 .form-wrapper {
   @apply flex flex-col gap-1 mb-4;
-  @apply lg:flex-row lg:items-center lg:gap-4;
+  @apply lg:flex-row lg:gap-4;
 }
 
 .inputBox, #genreSelect {
@@ -19,11 +19,7 @@
   @apply lg:max-w-xs;
 }
 .libraryTable {
-  @apply w-full border-collapse mt-4;
-}
-
-.libraryContainer {
-  /* @apply overflow-x-auto; */
+  @apply w-full border-collapse p-2 mt-5;
 }
 
 th, td {
@@ -33,5 +29,10 @@ th, td {
 
 .addToLibrary, #saveEdit {
   @apply bg-green-500 text-white font-bold py-3 w-full rounded border border-black;
-  @apply lg:py-2 lg:max-w-xs;
+  @apply lg:py-2 lg:max-w-xs mt-3;
+}
+h1,h2 {
+  @apply text-2xl font-bold mb-4;
+  @apply lg:text-3xl
+  p-2;
 }
