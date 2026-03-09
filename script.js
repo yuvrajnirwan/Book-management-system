@@ -75,7 +75,7 @@ function handleSubmit(event) {
                     resolve("Book saved");
                     
                     alert("Book saved successfully!");
-                }, 3000);
+                }, 2000);
             
         });
     })
