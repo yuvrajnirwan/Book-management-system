@@ -31,8 +31,17 @@
             <br>
             <br>
             <label for="genreInput">Genre:</label>
-            <input type="text" name="genre" id="genreInput" placeholder="Ex. Sci-fi, fiction" class="inputBox">
-            <br>
+            <select name="genre" id="genreInput">
+                <option value="" disabled selected hidden>Select a genre</option>
+        <option value="fiction">Fiction</option>
+        <option value="non-fiction">Non-fiction</option>
+        <option value="sci-fi">Sci-fi</option>
+        <option value="comedy">Comedy</option>
+         <option value="thriller">Thriller</option>
+        <option value="action">Action</option>
+        <option value="horror" >Horror</option>
+        <option value="mystery">Mystery</option>
+      </select>
             <br>
             <input type="submit" class="addToLibrary">
         </form>
