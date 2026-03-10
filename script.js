@@ -19,14 +19,17 @@ class Library {
     this.form=document.querySelector(".bookSubmitForm");
    }
 
+   bookAge(publishDate){
+    const currentYear = new Date().getFullYear();
+        const pubYear = new Date(publishDate).getFullYear();
+        return currentYear-pubYear;
+   }
    async handleSubmit(event){
     event.preventDefault();
     if (bookName.value === "" || authorName.value === "" || isbnNumber.value === "" || publishDate.value === "" || genre.value === "" || size==="" || page==="")  {
         alert("Please fill all the fields");
         return;
     }
-const currDate=new Date();
-    const bookAge = currDate.getFullYear() - new Date(publishDate.value).getFullYear();
  
     try{
     const response= await fetch('https://jsonplaceholder.typicode.com/posts', {
@@ -37,7 +40,7 @@ const currDate=new Date();
         author: authorName.value,
         isbn: isbnNumber.value,
         publishDate: publishDate.value,
-        age: bookAge,
+        age: this.bookAge(publishDate.value),
         genre: genre.value,
         price:price.value,
         size:size.value,
