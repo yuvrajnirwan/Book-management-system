@@ -30,6 +30,14 @@
             <input type="date" name="PDate" id="publishDate" class="inputBox">
             <br>
             <br>
+            <label for="pageNo">Hardcopy size(Pages):</label>
+            <input type="number" name="pageNo" id="pageNo" class="inputBox">
+            <br>
+            <br>
+            <label for="ebookSize">Ebook Size(MB):</label>
+            <input type="number" name="ebookSize" id="ebookSize" class="inputBox">
+            <br>
+            <br>
             <label for="genreInput">Genre:</label>
             <select name="genre" id="genreInput">
                 <option value="" disabled selected hidden>Select a genre</option>
@@ -42,6 +50,11 @@
         <option value="horror" >Horror</option>
         <option value="mystery">Mystery</option>
       </select>
+            <br>
+            <br>
+            <label for="price">Price(₹):</label>
+            <input type="number" name="price" id="price" class="inputBox">
+            <br>
             <br>
             <input type="submit" class="addToLibrary">
         </form>
@@ -68,6 +81,10 @@
         <option value="horror" >Horror</option>
         <option value="mystery">Mystery</option>
       </select></th>
+                <th>Pages</th>
+                <th>Ebook Size(MB)</th>
+                <th>Discount(%)</th>
+                <th>Price(₹)</th>
                 <th class="editRow">Edit</th>
                 <th class="deleteRow">Delete</th>
             </tr>
