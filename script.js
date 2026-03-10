@@ -7,24 +7,29 @@ const genre = document.querySelector("#genreInput");
 const table = document.querySelector(".libraryTable");
 const saveEdit = document.querySelector("#saveEdit");
 const books = [];
-const currDate=new Date();
 
-function handleSubmit(event) {
+
+class Library {
+   constructor(){
+    this.books=[];
+    this.table=document.querySelector(".libraryTable");
+    this.form=document.querySelector(".bookSubmitForm");
+   }
+
+   async handleSubmit(event){
     event.preventDefault();
-
     if (bookName.value === "" || authorName.value === "" || isbnNumber.value === "" || publishDate.value === "" || genre.value === "") {
         alert("Please fill all the fields");
         return;
     }
-
+const currDate=new Date();
     const bookAge = currDate.getFullYear() - new Date(publishDate.value).getFullYear();
 
-    const fetchPromise = () => {
-        return new Promise((resolve, reject) => {
-            fetch('https://jsonplaceholder.typicode.com/posts', {
+    try{
+    const response= await fetch('https://jsonplaceholder.typicode.com/posts', {
   method: 'POST',
   body: JSON.stringify({
-     id: books.length + 1,
+     id: this.books.length + 1,
         title: bookName.value,
         author: authorName.value,
         isbn: isbnNumber.value,
@@ -35,15 +40,11 @@ function handleSubmit(event) {
   headers: {
     'Content-type': 'application/json; charset=UTF-8',
   },
-})
-  .then((response) => response.json())
-  .then((json) => {
-        console.log("API Response:", json);
-        return new Promise((resolve,reject)=>{
-            
-                setTimeout(()=>{
-        
-                    const newRow = document.createElement("tr");
+});
+  
+const json=await response.json();
+console.log("API response: ",json);
+                const newRow = document.createElement("tr");
                     newRow.innerHTML =
                         `<td>${json.id}</td>` +
                         `<td>${json.title}</td>` +
@@ -54,124 +55,128 @@ function handleSubmit(event) {
                         `<td>${json.genre}</td>` +
                         `<td class="edit"></td><td class="delete"></td>`;
   
-
+  const confirmed=confirm("Do you want to save this book?");
+  if(confirmed){
+                    setTimeout(()=>{
                     const rowEditBtn = document.createElement("button");
                     rowEditBtn.textContent = "Edit";
-                    rowEditBtn.addEventListener("click", () => editBook(json.id));
+                    rowEditBtn.addEventListener("click", () => this.editBook(json.id));
 
                     const rowDeleteBtn = document.createElement("button");
                     rowDeleteBtn.textContent = "Delete";
-                    rowDeleteBtn.addEventListener("click", () => deleteBook(json.id));
+                    rowDeleteBtn.addEventListener("click", () => this.deleteBook(json.id));
 
                     newRow.querySelector("td.edit").appendChild(rowEditBtn);
                     newRow.querySelector("td.delete").appendChild(rowDeleteBtn);
 
-                    books.push(json);
-                    table.appendChild(newRow);
+                    this.books.push(json);
+                    this.table.appendChild(newRow);
                     console.log("Book Added:", json);
                     console.log("All books:", books);
-                    form.reset();
-                    filterBooks();
-                    resolve("Book saved");
+                    this.form.reset();
+                    if (typeof this.filterBooks === "function") {
+                    this.filterBooks();
+                }
                     
                     alert("Book saved successfully!");
-                }, 2000);
-            
-        });
-    })
-    .then((result) => {
-        resolve(result);
-    })
-    .catch((error) => {
-        reject(error);
-    });
-        });
-    };
-    fetchPromise();
+                    }, 2000);
+    }
+    } catch(error){
+        console.error("Error:", error);
+        alert("Error saving book. Please try again.")
+    }
+   }
+
+   editBook(id) {
+       alert("Press Save changes button after editing details")
+       const rows = this.table.querySelectorAll("tr");
+       for (let i = 1; i < rows.length; i++) {
+           const cell = rows[i].children[0];
+           if (parseInt(cell.textContent, 10) === id) {
+               rows[i].setAttribute("contenteditable", "true");
+               rows[i].children[0].setAttribute("contenteditable","false");
+               rows[i].children[5].setAttribute("contenteditable","false");
+               rows[i].children[7].setAttribute("contenteditable","false");
+               rows[i].children[8].setAttribute("contenteditable","false");
+               break;
+           }
+       }
+   }
+
+   deleteBook(id) {
+    const deleteConfirmed = confirm("Are you sure you want to delete this book?");
+    if(deleteConfirmed){
+       const index = this.books.findIndex(b => b.id === id);
+       if (index === -1) {
+           alert("Book not found.");
+           return;
+       }
+       this.books.splice(index, 1);
+       const rows = this.table.querySelectorAll("tr");
+       for (let i = 1; i < rows.length; i++) {
+           const cell = rows[i].children[0];
+           if (parseInt(cell.textContent, 10) === id) {
+               rows[i].remove();
+               break;
+           }
+       }
+       alert("Book deleted successfully!");
+       console.log("All books:", this.books);
+       this.filterBooks();
+   }}
+
+   handleSaveEdit() {
+    const saveConfirmed = confirm("Are you sure you want to save the changes?");
+    if(saveConfirmed){
+       const currDate = new Date();
+       const rows = this.table.querySelectorAll("tr");
+       for (let i = 1; i < rows.length; i++) {
+           if (rows[i].getAttribute("contenteditable") === "true") {
+               const id = parseInt(rows[i].children[0].textContent, 10);
+               const title = rows[i].children[1].textContent;
+               const author = rows[i].children[2].textContent;
+               const isbn = rows[i].children[3].textContent;
+               const publishDateText = rows[i].children[4].textContent;
+               const age = currDate.getFullYear() - new Date(publishDateText).getFullYear();
+               const genreText = rows[i].children[6].textContent;
+
+               rows[i].children[5].textContent = age;
+
+               const updatedBook = { id, title, author, isbn, publishDate: publishDateText, age, genre: genreText };
+               alert("Details updated successfully!");
+               console.log("Updated Book:", updatedBook);
+
+               const index = this.books.findIndex(book => book.id === id);
+               if (index !== -1) {
+                   this.books[index] = updatedBook;
+                   console.log("All books:", this.books);
+               }
+
+               rows[i].setAttribute("contenteditable", "false");
+           }
+       }
+   }
 }
 
-function editBook(id) {
-    alert("Press Save changes button after editing details")
-     const rows = table.querySelectorAll("tr");
-     for (let i = 1; i < rows.length; i++) {
-        const cell = rows[i].children[0];
-        if (parseInt(cell.textContent, 10) === id) {
-            rows[i].setAttribute("contenteditable", "true");
-            rows[i].children[0].setAttribute("contenteditable","false");
-            rows[i].children[5].setAttribute("contenteditable","false");
-             rows[i].children[7].setAttribute("contenteditable","false");
-            rows[i].children[8].setAttribute("contenteditable","false");
-            break;
-        }
-    }
+   filterBooks() {
+       const rows = this.table.querySelectorAll("tr");
+       const filtered = document.querySelector("#genreSelect").value.toLowerCase();
+       for(let i = 1; i < rows.length; i++){
+           const genreCell = rows[i].children[6].textContent.toLowerCase();
+           if(filtered === "all" || genreCell === filtered){
+               rows[i].style.display = "";
+           } else {
+               rows[i].style.display = "none";
+           }
+       }
+   }
 }
 
-function deleteBook(id) {
-    const index = books.findIndex(b => b.id === id);
-    if (index === -1) {
-        alert("Book not found.");
-        return;
-    }
-    books.splice(index, 1);
-    const rows = table.querySelectorAll("tr");
-    for (let i = 1; i < rows.length; i++) {
-        const cell = rows[i].children[0];
-        if (parseInt(cell.textContent, 10) === id) {
-            rows[i].remove();
-            break;
-        }
-    }
-    alert("Book deleted successfully!");
-    console.log("All books:", books);
-    filterBooks();
-}
-
-function handleSaveEdit(){
-    const rows = table.querySelectorAll("tr");
-    for (let i = 1; i < rows.length; i++) {
-        if (rows[i].getAttribute("contenteditable") === "true") {
-            const id = parseInt(rows[i].children[0].textContent, 10);
-            const title = rows[i].children[1].textContent;
-            const author = rows[i].children[2].textContent;
-            const isbn = rows[i].children[3].textContent;
-            const publishDateText = rows[i].children[4].textContent;
-            const age = currDate.getFullYear() - new Date(publishDateText).getFullYear();
-            const genreText = rows[i].children[6].textContent;
-
-            rows[i].children[5].textContent = age;
-
-            const updatedBook = { id, title, author, isbn, publishDate: publishDateText, age, genre: genreText };
-            alert("Details updated successfully!");
-            console.log("Updated Book:", updatedBook);
-
-            const index = books.findIndex(book => book.id === id);
-            if (index !== -1) {
-                books[index] = updatedBook;
-                console.log("All books:", books);
-            }
-
-            rows[i].setAttribute("contenteditable", "false");
-        }
-    }
-}
-function filterBooks(){
-    const rows = table.querySelectorAll("tr");
-    const filtered = document.querySelector("#genreSelect").value.toLowerCase();
-    for(let i = 1; i < rows.length; i++){
-        const genreCell = rows[i].children[6].textContent.toLowerCase();
-        if(filtered === "all" || genreCell === filtered){
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
-}
-
-form.addEventListener("submit", handleSubmit);
-saveEdit.addEventListener("click", () => handleSaveEdit());
+const library = new Library();
+form.addEventListener("submit", (event) => library.handleSubmit(event));
+saveEdit.addEventListener("click", () => library.handleSaveEdit());
 
 const genreSelect = document.querySelector("#genreSelect");
 if (genreSelect) {
-    genreSelect.addEventListener("change", filterBooks);
+    genreSelect.addEventListener("change", () => library.filterBooks());
 }
-filterBooks();
