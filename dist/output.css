@@ -13,7 +13,7 @@
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
-    --container-xs: 20rem;
+    --container-sm: 24rem;
     --container-3xl: 48rem;
     --text-xs: 0.75rem;
     --text-xs--line-height: calc(1 / 0.75);
@@ -188,6 +188,9 @@
   gap: calc(var(--spacing) * 8);
   padding: calc(var(--spacing) * 2);
   @media (width >= 64rem) {
+    width: auto;
+  }
+  @media (width >= 64rem) {
     flex-direction: row;
   }
   @media (width >= 64rem) {
@@ -209,6 +212,9 @@
   flex-direction: column;
   gap: calc(var(--spacing) * 1);
   @media (width >= 64rem) {
+    width: auto;
+  }
+  @media (width >= 64rem) {
     flex-direction: row;
   }
   @media (width >= 64rem) {
@@ -216,7 +222,7 @@
   }
 }
 .inputBox, #genreInput {
-  width: 100%;
+  width: var(--container-sm);
   border-radius: 0.25rem;
   border-style: var(--tw-border-style);
   border-width: 1px;
@@ -224,15 +230,15 @@
   padding: calc(var(--spacing) * 2);
   font-size: var(--text-sm);
   line-height: var(--tw-leading, var(--text-sm--line-height));
-  @media (width >= 64rem) {
-    max-width: var(--container-xs);
-  }
 }
 .libraryTable {
   margin-top: calc(var(--spacing) * 5);
   width: 100%;
   border-collapse: collapse;
   padding: calc(var(--spacing) * 2);
+  @media (width >= 64rem) {
+    width: auto;
+  }
 }
 th, td {
   border-style: var(--tw-border-style);
@@ -243,7 +249,7 @@ th, td {
   font-size: var(--text-xs);
   line-height: var(--tw-leading, var(--text-xs--line-height));
   @media (width >= 64rem) {
-    padding: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 2);
   }
   @media (width >= 64rem) {
     font-size: var(--text-sm);
@@ -263,7 +269,7 @@ th, td {
   color: var(--color-white);
   margin-top: calc(var(--spacing) * 3);
   @media (width >= 64rem) {
-    max-width: var(--container-xs);
+    max-width: 100%;
   }
   @media (width >= 64rem) {
     padding-block: calc(var(--spacing) * 2);
