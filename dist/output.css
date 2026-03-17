@@ -221,7 +221,7 @@
     gap: calc(var(--spacing) * 4);
   }
 }
-.inputBox, #genreInput {
+.inputBox, #genreInput, #bookType {
   width: var(--container-sm);
   border-radius: 0.25rem;
   border-style: var(--tw-border-style);

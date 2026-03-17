@@ -1,15 +1,18 @@
-// DOM Selectors with correct types
-const form = document.querySelector(".bookSubmitForm") as HTMLFormElement; // Changed to Form
+const form = document.querySelector(".bookSubmitForm") as HTMLFormElement; 
 const table = document.querySelector(".libraryTable") as HTMLTableElement;
 const bookName = document.querySelector("#bookName") as HTMLInputElement;
 const authorName = document.querySelector("#authorName") as HTMLInputElement;
 const isbnNumber = document.querySelector("#isbnNumber") as HTMLInputElement;
 const publishDate = document.querySelector("#publishDate") as HTMLInputElement;
-const genre = document.querySelector("#genreInput") as HTMLInputElement;
+const genreInput = document.querySelector("#genreInput") as HTMLSelectElement;
+const genreSelect = document.querySelector("#genreSelect") as HTMLSelectElement; 
 const size = document.querySelector("#ebookSize") as HTMLInputElement;
 const page = document.querySelector("#pageNo") as HTMLInputElement;
 const price = document.querySelector("#price") as HTMLInputElement;
 const saveEditBtn = document.querySelector("#saveEdit") as HTMLButtonElement;
+const bookType = document.querySelector("#bookType") as HTMLSelectElement;
+const pageLabel = document.querySelector("#pageLabel") as HTMLLabelElement;
+const sizeLabel = document.querySelector("#sizeLabel") as HTMLLabelElement;
 
 interface Book {
     id: number;
@@ -19,56 +22,59 @@ interface Book {
     publishDate: string;
     genre: string;
     age: number;
-    price: number;
+    price: number; 
     discount: number;
     size?: string;
     page?: string;
-    finalPrice?: number;
 }
 
-class BaseBook {
-    books: Book[] = [];
-    public table = table;
 
-    calculateBookAge(date: string): number {
-        const currYear = new Date().getFullYear();
-        const publishYear = new Date(date).getFullYear(); // Fixed: Use the 'date' parameter
-        return currYear - publishYear;
+class BaseBook {
+    books: Book[] = []; 
+    constructor() {
+        bookType.addEventListener("change", this.toggleVisibility);
+        this.toggleVisibility();
     }
 
-    async sendToApi(data: Book): Promise<Book> {
-        const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-        return await response.json() as Book;
+    public toggleVisibility = (): void => {
+        const selectedType = bookType.value;
+        const isPrinted = selectedType === 'Printed Book';
+        const isEbook = selectedType === 'Ebook';
+
+        page.style.display = isPrinted ? 'block' : 'none';
+        pageLabel.style.display = isPrinted ? 'block' : 'none';
+        size.style.display = isEbook ? 'block' : 'none';
+        sizeLabel.style.display = isEbook ? 'block' : 'none';
+    }
+
+    calculateBookAge(date: string): number {
+        const currentYear = new Date().getFullYear();
+        const pubYear = new Date(date).getFullYear();
+        return isNaN(pubYear) ? 0 : currentYear - pubYear;
     }
 
     renderRow(data: Book) {
-        const discountAmount = data.price * (data.discount / 100);
-        const finalPrice = data.price - discountAmount;
-        const row: HTMLTableRowElement = document.createElement("tr");
+        const finalPrice = data.price - (data.price * (data.discount / 100));
+        const row = document.createElement("tr");
 
-        // Fixed: Removed double $$ and ensured .toFixed() safety
-      row.innerHTML = `
-        <td>${data.id}</td>
-        <td>${data.title}</td>
-        <td>${data.author}</td>
-        <td>${data.isbn}</td>
-        <td>${data.publishDate}</td>
-        <td>${data.age}</td>
-        <td>${data.genre}</td>
-        <td>${data.page || "N/A"}</td>
-        <td>${data.size ? data.size + " MB" : "N/A"}</td>
-        <td>${data.discount}%</td>
-        <td>₹${finalPrice.toFixed(2)}</td>
-        <td class="edit"></td>
-        <td class="delete"></td>
-    `;
+        row.innerHTML = `
+            <td>${data.id}</td>
+            <td>${data.title}</td>
+            <td>${data.author}</td>
+            <td>${data.isbn}</td>
+            <td>${data.publishDate}</td>
+            <td>${data.age}</td>
+            <td>${data.genre}</td>
+            <td>${data.page || "N/A"}</td>
+            <td>${data.size ? data.size + " MB" : "N/A"}</td>
+            <td>${data.discount}%</td>
+            <td>₹${finalPrice.toFixed(2)}</td>
+            <td class="edit"></td>
+            <td class="delete"></td>
+        `;
 
         this.attachButtons(row, data.id);
-        this.table.appendChild(row);
+        table.appendChild(row);
     }
 
     attachButtons(row: HTMLTableRowElement, id: number): void {
@@ -84,27 +90,13 @@ class BaseBook {
         row.querySelector(".delete")?.appendChild(deleteBtn);
     }
 
-    deleteBook(id: number) {
-        if (confirm("Want to delete this book?")) {
-            const rows = this.table.querySelectorAll<HTMLTableRowElement>("tr");
-            rows.forEach((row) => {
-                const firstCell = row.children[0];
-                if (firstCell && parseInt(firstCell.textContent || "0") === id) {
-                    row.remove();
-                }
-            });
-            this.books = this.books.filter(b => b.id !== id);
-        }
-    }
-
     editBook(id: number) {
         if (confirm("Want to edit this book?")) {
-            const rows = this.table.querySelectorAll<HTMLTableRowElement>("tr");
-            rows.forEach((row) => {
+            const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
+            rows.forEach(row => {
                 const idCell = row.children[0];
                 if (idCell && parseInt(idCell.textContent || "0") === id) {
-                    const editableIndices = [1, 2, 3, 4, 9];
-                    editableIndices.forEach(i => {
+                    [1, 2, 3, 4, 9].forEach(i => {
                         const cell = row.children[i] as HTMLElement;
                         if (cell) {
                             cell.contentEditable = "true";
@@ -118,127 +110,126 @@ class BaseBook {
 
     handleSaveEdit() {
         if (confirm("Want to save new details?")) {
-            const rows = this.table.querySelectorAll<HTMLTableRowElement>("tr");
-            rows.forEach((row) => {
-                const titleCell = row.children[1] as HTMLElement;
-                if (titleCell && titleCell.isContentEditable) {
-                    const id = parseInt(row.children[0]!.textContent || "0");
+            const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
+            rows.forEach(row => {
+                const cells = row.children;
+                if ((cells[1] as HTMLElement).isContentEditable) {
+                    const id = parseInt(cells[0]!.textContent || "0");
                     const book = this.books.find(b => b.id === id);
+
                     if (!book) return;
 
-                    const publishDateText = row.children[4]!.textContent || "";
-                    const age = this.calculateBookAge(publishDateText);
-                    row.children[5]!.textContent = `${age}`;
+                    const newDate = cells[4]!.textContent || "";
+                    book.publishDate = newDate;
+                    book.age = this.calculateBookAge(newDate);
+                    (cells[5] as HTMLElement).textContent = `${book.age}`;
 
-                    const discount = parseFloat(row.children[9]!.textContent || "0");
+                    const discountText = (cells[9]!.textContent || "0").replace("%", "");
+                    const discount = parseFloat(discountText) || 0;
                     const finalPrice = book.price - (book.price * (discount / 100));
 
-                    row.children[9]!.textContent = discount + "%";
-                    row.children[10]!.textContent = "₹" + finalPrice.toFixed(2);
+                    (cells[9] as HTMLElement).textContent = discount + "%";
+                    (cells[10] as HTMLElement).textContent = "₹" + finalPrice.toFixed(2);
 
                     book.discount = discount;
+                    book.title = cells[1]!.textContent || "";
+                    book.author = cells[2]!.textContent || "";
+
+                    [1, 2, 3, 4, 9].forEach(i => {
+                        const cell = cells[i] as HTMLElement;
+                        cell.contentEditable = "false";
+                    });
                 }
             });
             alert("Changes Saved");
         }
     }
 
-    async handleSubmit(event: SubmitEvent): Promise<void> {
-        event.preventDefault();
+    filterBooks(): void {
+        const filteredValue = genreSelect.value.toLowerCase();
+        const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
+        rows.forEach((row, index) => {
+            if (index === 0) return;
+            const genreCell = row.children[6] as HTMLElement;
+            if (genreCell) {
+                const genreText = (genreCell.textContent || "").toLowerCase().trim();
+                row.style.display = (filteredValue === "all" || genreText === filteredValue) ? "" : "none";
+            }
+        });
+    }
 
-        if (!bookName.value || !authorName.value || !isbnNumber.value || !price.value) {
-            alert("Please fill all required fields");
-            return;
-        }
-
-        if (!confirm("Add book to library?")) return;
-
-        const bookData: Book = {
-            id: this.books.length + 1,
-            title: bookName.value,
-            author: authorName.value,
-            isbn: isbnNumber.value,
-            publishDate: publishDate.value,
-            genre: genre.value,
-            age: this.calculateBookAge(publishDate.value),
-            price: parseFloat(price.value) || 0,
-            discount: 5
-        };
-
-        const apiData = await this.sendToApi(bookData);
-        apiData.id = this.books.length + 1; // Sync ID after API "success"
-
-        if (size.value) apiData.size = size.value;
-        if (page.value) apiData.page = page.value;
-
-        this.books.push(apiData);
-        this.renderRow(apiData);
-        form.reset();
-        alert("Book added to library");
+    deleteBook(id: number) {
+        if (!confirm("Delete this book?")) return;
+        const rows = table.querySelectorAll("tr");
+        rows.forEach(row => {
+            if (parseInt(row.children[0]?.textContent || "0") === id) row.remove();
+        });
+        this.books = this.books.filter(b => b.id !== id);
     }
 }
 
-// Child Classes
 class EBook extends BaseBook {
-    addBook(): void {
-        const data: Book = {
-            id: this.books.length + 1,
+    createBookObject(): Book {
+        return {
+            id: 0, 
             title: bookName.value,
             author: authorName.value,
             isbn: isbnNumber.value,
             publishDate: publishDate.value,
-            genre: genre.value,
+            genre: genreInput.value,
             age: this.calculateBookAge(publishDate.value),
             price: parseFloat(price.value) || 0,
             discount: 10,
             size: size.value
         };
-        this.books.push(data);
-        this.renderRow(data);
-        alert("E-Book added locally!");
     }
 }
 
 class PrintedBook extends BaseBook {
-    addBook(): void {
-        const data: Book = {
-            id: this.books.length + 1,
+    createBookObject(): Book {
+        return {
+            id: 0, 
             title: bookName.value,
             author: authorName.value,
             isbn: isbnNumber.value,
             publishDate: publishDate.value,
-            genre: genre.value,
+            genre: genreInput.value,
             age: this.calculateBookAge(publishDate.value),
             price: parseFloat(price.value) || 0,
             discount: 5,
             page: page.value
         };
-        this.books.push(data);
-        this.renderRow(data);
-        alert("Printed Book added locally!");
     }
 }
 
-// Global Initialization
-const library = new BaseBook();
-const ebookHandler = new EBook();
-const printedHandler = new PrintedBook();
 
-form.addEventListener("submit", (e: SubmitEvent) => {
-    // Decision logic for which class to use
-    if (size.value !== "") {
-        e.preventDefault();
-        ebookHandler.addBook();
-        form.reset();
-    } else if (page.value !== "") {
-        e.preventDefault();
-        printedHandler.addBook();
-        form.reset();
+const library = new BaseBook(); 
+const ebookCreator = new EBook();
+const printedCreator = new PrintedBook();
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    let newBook: Book;
+    if (bookType.value === "Ebook") {
+        newBook = ebookCreator.createBookObject();
     } else {
-        library.handleSubmit(e);
+        newBook = printedCreator.createBookObject();
     }
+
+    newBook.id = library.books.length + 1;
+    library.books.push(newBook);
+    library.renderRow(newBook);
+    
+    form.reset();
+    library.toggleVisibility();
+    alert("Book added successfully!");
 });
 
 saveEditBtn.addEventListener("click", () => {
     library.handleSaveEdit();
+});
+
+genreSelect.addEventListener("change", () => {
+    library.filterBooks();
 });

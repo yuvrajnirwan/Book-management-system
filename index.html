@@ -29,11 +29,19 @@
             <input type="date" name="PDate" id="publishDate" class="inputBox">
              <br>
             <br>
-            <label for="pageNo">Hardcopy size(Pages):</label>
+             <label for="bookType">Book Type:</label>
+            <select name="type" id="bookType">
+                <option value="" disabled selected hidden>Select book type</option>
+        <option value="Printed Book">Printed Book</option>
+        <option value="Ebook">Ebook</option>
+        </select>
+        <br>
+        
+            <label for="pageNo" id="pageLabel">Hardcopy size(Pages):</label>
             <input type="number" name="pageNo" id="pageNo" class="inputBox">
              <br>
             <br>
-            <label for="ebookSize">Ebook Size(MB):</label>
+            <label for="ebookSize" id="sizeLabel">Ebook Size(MB):</label>
             <input type="number" name="ebookSize" id="ebookSize" class="inputBox">
              <br>
             <br>

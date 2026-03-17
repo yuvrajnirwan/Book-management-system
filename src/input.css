@@ -14,7 +14,7 @@
   @apply lg:flex-row lg:gap-4 lg:w-auto;
 }
 
-.inputBox, #genreInput {
+.inputBox, #genreInput, #bookType {
   @apply w-sm border border-amber-200 p-2 rounded text-sm;
   /* @apply lg:max-w-xs; */
 }
