@@ -14,6 +14,9 @@ const bookType = document.querySelector("#bookType") as HTMLSelectElement;
 const pageLabel = document.querySelector("#pageLabel") as HTMLLabelElement;
 const sizeLabel = document.querySelector("#sizeLabel") as HTMLLabelElement;
 
+
+// --- I: Interface Segregation Principle
+
 interface Book {
     id: number;
     title: string;
@@ -36,7 +39,7 @@ class BaseBook {
         this.toggleVisibility();
     }
 
-    public toggleVisibility = (): void => {
+    public toggleVisibility = (): void => {   // --- S: Single Responsibility Principle-> Only handle UI visibility
         const selectedType = bookType.value;
         const isPrinted = selectedType === 'Printed Book';
         const isEbook = selectedType === 'Ebook';
@@ -47,13 +50,13 @@ class BaseBook {
         sizeLabel.style.display = isEbook ? 'block' : 'none';
     }
 
-    calculateBookAge(date: string): number {
+    calculateBookAge(date: string): number {   // --- S: Single Responsibility Principle-> Only calculate book age
         const currentYear = new Date().getFullYear();
         const pubYear = new Date(date).getFullYear();
         return isNaN(pubYear) ? 0 : currentYear - pubYear;
     }
 
-    renderRow(data: Book) {
+    renderRow(data: Book) {     /// --- S: Single Responsibility Principle-> Only render Table row
         const finalPrice = data.price - (data.price * (data.discount / 100));
         const row = document.createElement("tr");
 
@@ -77,7 +80,7 @@ class BaseBook {
         table.appendChild(row);
     }
 
-    attachButtons(row: HTMLTableRowElement, id: number): void {
+    attachButtons(row: HTMLTableRowElement, id: number): void {  // --- S: Single Responsibility Principle-> Only attach buttons
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edit";
         editBtn.onclick = () => this.editBook(id);
@@ -90,7 +93,7 @@ class BaseBook {
         row.querySelector(".delete")?.appendChild(deleteBtn);
     }
 
-    editBook(id: number) {
+    editBook(id: number) {    // --- S: Single Responsibility Principle-> handles editing of books only
         if (confirm("Want to edit this book?")) {
             const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
             rows.forEach(row => {
@@ -108,7 +111,7 @@ class BaseBook {
         }
     }
 
-    handleSaveEdit() {
+    handleSaveEdit() {       // --- S: Single Responsibility Principle-> handles saving of edited books
         if (confirm("Want to save new details?")) {
             const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
             rows.forEach(row => {
@@ -145,7 +148,7 @@ class BaseBook {
         }
     }
 
-    filterBooks(): void {
+    filterBooks(): void {   // --- S: Single Responsibility Principle-> handles filtering of books
         const filteredValue = genreSelect.value.toLowerCase();
         const rows = table.querySelectorAll<HTMLTableRowElement>("tr");
         rows.forEach((row, index) => {
@@ -158,7 +161,7 @@ class BaseBook {
         });
     }
 
-    deleteBook(id: number) {
+    deleteBook(id: number) {   // --- S: Single Responsibility Principle-> handles deletion of books
         if (!confirm("Delete this book?")) return;
         const rows = table.querySelectorAll("tr");
         rows.forEach(row => {
@@ -168,8 +171,11 @@ class BaseBook {
     }
 }
 
+
+// --- L: Liskov Substitution Principle
+// --- D: Dependency Inversion -> depends on Superclass: BaseBook
 class EBook extends BaseBook {
-    createBookObject(): Book {
+    createBook(): Book {
         return {
             id: 0, 
             title: bookName.value,
@@ -186,7 +192,7 @@ class EBook extends BaseBook {
 }
 
 class PrintedBook extends BaseBook {
-    createBookObject(): Book {
+    createBook(): Book {
         return {
             id: 0, 
             title: bookName.value,
@@ -207,14 +213,16 @@ const library = new BaseBook();
 const ebookCreator = new EBook();
 const printedCreator = new PrintedBook();
 
+
+// --- O: Open/Closed Principle
 form.addEventListener("submit", (e) => {
     e.preventDefault();
     
     let newBook: Book;
     if (bookType.value === "Ebook") {
-        newBook = ebookCreator.createBookObject();
+        newBook = ebookCreator.createBook();
     } else {
-        newBook = printedCreator.createBookObject();
+        newBook = printedCreator.createBook();
     }
 
     newBook.id = library.books.length + 1;
