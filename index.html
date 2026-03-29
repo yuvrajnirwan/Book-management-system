@@ -3,46 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./dist/output.css">
     <title>Book Management System</title>
 </head>
 <body>
-    <div>
+    <div class="form-wrapper">
+    <div class="formContainer">
         <form class="bookSubmitForm" >
             <h1>Book Entry Form</h1>
             <hr>
             <br>
             <br>
-            <label for="Bname">Title:</label>
-            <input type="text" name="Bname" id="bookName" placeholder="Enter book name">
+            <label for="bookName">Title:</label>
+            <input type="text" name="Bname" id="bookName"  class="inputBox" placeholder="Enter book name">
             <br>
             <br>
-            <label for="Author">Author name:</label>
-            <input type="text" name="Author" id="authorName" placeholder="Enter author of the book">
+            <label for="authorName">Author name:</label>
+            <input type="text" name="Author" id="authorName" class="inputBox" placeholder="Enter author of the book">
             <br>
             <br>
-            <label for="ISBN">ISBN No.:</label>
-            <input type="number" name="ISBN" id="isbnNumber" class="inputs" placeholder="Enetr book's ISBN no.">
+            <label for="isbnNumber">ISBN No.:</label>
+            <input type="number" name="ISBN" id="isbnNumber" class="inputBox" placeholder="Enter book's ISBN no.">
             <br>
             <br>
-            <label for="PDate">Publication Date:</label>
-            <input type="date" name="PDate" id="publishDate">
+            <label for="publishDate">Publication Date:</label>
+            <input type="date" name="PDate" id="publishDate" class="inputBox">
             <br>
             <br>
-            <label for="genre">Genre:</label>
-            <input type="text" name="genre" id="genreInput" placeholder="Ex. Sci-fi, fiction">
+            <label for="genreInput">Genre:</label>
+            <select name="genre" id="genreInput">
+                <option value="" disabled selected hidden>Select a genre</option>
+        <option value="fiction">Fiction</option>
+        <option value="non-fiction">Non-fiction</option>
+        <option value="sci-fi">Sci-fi</option>
+        <option value="comedy">Comedy</option>
+         <option value="thriller">Thriller</option>
+        <option value="action">Action</option>
+        <option value="horror" >Horror</option>
+        <option value="mystery">Mystery</option>
+      </select>
             <br>
-            <br>
-            <input type="submit">
-            <br>
-            <br>
-            <input type="button" value="Delete book" id="deleteBtn">
-            <br>
-            <br>
-            <input type="button" value="edit book" id="editBtn">
+            <input type="submit" class="addToLibrary">
         </form>
-    </div>
-    <div>
-        <h1>Library</h1>
+        </div>
+    <div class="libraryContainer">
+        <h2>Library</h2>
+        <hr>
         <table class="libraryTable">
             <tr>
                 <th>Book ID</th>
@@ -51,10 +57,24 @@
                 <th>ISBN no.</th>
                 <th>Publish date</th>
                 <th>Age(years)</th>
-                <th>Genre</th>
+                <th>Genre <select name="genre" id="genreSelect">
+                    <option value="all" selected>All</option>
+        <option value="fiction">Fiction</option>
+        <option value="non-fiction">Non-fiction</option>
+        <option value="sci-fi">Sci-fi</option>
+        <option value="comedy">Comedy</option>
+         <option value="thriller">Thriller</option>
+        <option value="action">Action</option>
+        <option value="horror" >Horror</option>
+        <option value="mystery">Mystery</option>
+      </select></th>
+                <th class="editRow">Edit</th>
+                <th class="deleteRow">Delete</th>
             </tr>
         </table>
+        <button id="saveEdit">Save Changes</button>
     </div>
+    
     <script src="script.js"></script>
     </script>
 </body>
