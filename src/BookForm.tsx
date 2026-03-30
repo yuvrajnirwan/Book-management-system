@@ -35,13 +35,12 @@ function BookForm() {
         return (price - (price * (discount / 100))).toFixed(2);
     };
 
-    // FIXED: HandleChange now ensures you can type freely
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
         setForm(prev => ({
             ...prev,
-            [name]: (name === 'price' || name === 'isbn' || name === 'pageNo' || name === 'ebookSize')
+            [name]: (name === 'price' || name === 'ISBN' || name === 'pageNo' || name === 'ebookSize')
                 ? (value === '' ? 0 : Number(value))
                 : value
         }));
@@ -49,7 +48,7 @@ function BookForm() {
 
     const handleSaveProcess = () => {
         if (!form.bookName || !form.author || !form.publishDate || !form.bookType) {
-            alert("Please fill in required fields!");
+            alert("Please fill all required fields!");
             return;
         }
         const isEbook = form.bookType === "Ebook";
@@ -57,7 +56,6 @@ function BookForm() {
             ...form,
             age: calculateAge(form.publishDate),
             discount: isEbook ? 10 : 5,
-            // These stay what they were when first added
             pageNo: form.bookType === "Printed Book" ? form.pageNo : 0,
             ebookSize: form.bookType === "Ebook" ? form.ebookSize : 0
         };
@@ -107,7 +105,6 @@ function BookForm() {
                 </select>
                 <br /><br />
 
-                {/* Conditional Inputs - Only visible during INITIAL ADD, effectively uneditable later if you don't change type */}
                 {form.bookType === "Printed Book" && (
                     <>
                         <label htmlFor="pageNo" id="pageLabel">Hardcopy size(Pages):</label>
@@ -166,8 +163,8 @@ function BookForm() {
                     </thead>
                     <tbody>
                     {books.map((book, idx) => (
-                        <tr key={idx} style={{ backgroundColor: editIndex === idx ? '#fff3cd' : 'transparent' }}>
-                            {/* THESE REMAIN UNEDITABLE (TEXT ONLY) */}
+                        <tr key={idx} >
+
                             <td>{idx + 1}</td>
                             <td>{book.bookName}</td>
                             <td>{book.author}</td>
