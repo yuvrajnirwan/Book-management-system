@@ -18,8 +18,6 @@ function BookForm() {
 
     const [form, setForm] = useState<Books>(initialFormState);
     const [editIndex, setEditIndex] = useState<number | null>(null);
-
-    // --- Filter State ---
     const [genreFilter, setGenreFilter] = useState("All");
 
     const calculateAge = (date: string): number => {
@@ -67,14 +65,13 @@ function BookForm() {
         setForm(initialFormState);
     };
 
-    // --- Filter Logic ---
     const filteredBooks = books.filter(book =>
         genreFilter === "All" || book.genre === genreFilter
     );
 
     return (
         <div className="formContainer">
-            {/* 1. ENTRY FORM */}
+
             <form className="bookSubmitForm" onSubmit={(e: SubmitEvent) => { e.preventDefault(); handleSaveProcess(); }}>
                 <h1>{editIndex !== null ? "Edit Book" : "Book Entry Form"}</h1>
                 <hr /><br />
@@ -127,7 +124,6 @@ function BookForm() {
                 <button type="submit" className="addToLibrary">{editIndex !== null ? "Update Book" : "Submit"}</button>
             </form>
 
-            {/* 2. LIBRARY TABLE SECTION */}
             <div className="libraryContainer">
                 <h2>Library</h2>
                 <hr /><br />
@@ -141,7 +137,7 @@ function BookForm() {
                         <th>ISBN</th>
                         <th>Date</th>
                         <th>Age</th>
-                        {/* GENRE FILTER INSIDE THE CELL */}
+
                         <th>
                             <select
                                 value={genreFilter}
