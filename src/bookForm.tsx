@@ -1,24 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { ChangeEvent, SubmitEvent, KeyboardEvent } from "react";
 
 import type { Books } from "./types/Books.ts";
 import type { RootState, AppDispatch } from "./app/store";
-import { addBook, updateBook, deleteBook } from "./features/BookSlice";
+
+import { setAllBooks, addBook, updateBook, deleteBook } from "./features/BookSlice";
 
 function BookForm() {
     const dispatch = useDispatch<AppDispatch>();
     const books = useSelector((state: RootState) => state.library.books);
 
     const initialFormState: Books = {
-        id: 0, bookName: "", author: "", isbn: 0, publishDate: "",
-        age: 0, pageNo: 0, ebookSize: 0, genre: "", price: 0,
-        discount: 5, bookType: ""
+        id: 0,
+        bookName: "",
+        author: "",
+        isbn: 0,
+        publishDate: "",
+        bookType: "",
+        pageNo: 0,
+        ebookSize: 0,
+        genre: "",
+        price: 0,
+        discount: 0,
+        age: 0
     };
 
     const [form, setForm] = useState<Books>(initialFormState);
-    const [editIndex, setEditIndex] = useState<number | null>(null);
+
+    const [editId, setEditId] = useState<number | null>(null);
     const [genreFilter, setGenreFilter] = useState("All");
+
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/books');
+                if (response.ok) {
+                    const data = await response.json();
+                    dispatch(setAllBooks(data));
+                } else {
+                    console.error("Failed to fetch books from server");
+                }
+            } catch (error) {
+                console.error("Network error while fetching books:", error);
+            }
+        };
+
+        fetchBooks();
+    }, [dispatch]);
 
     const calculateAge = (date: string): number => {
         if (!date) return 0;
@@ -42,27 +72,77 @@ function BookForm() {
         }));
     };
 
-    const handleSaveProcess = () => {
+
+    const handleSaveProcess = async () => {
         if (!form.bookName || !form.author || !form.publishDate || !form.bookType || !form.genre) {
             alert("Please fill all required fields!");
             return;
         }
+
         const isEbook = form.bookType === "Ebook";
-        const updatedBook: Books = {
-            ...form,
+        const { id, ...rest } = form;
+        const updatedBook: Omit<Books, 'id'> = {
+            ...rest,
             age: calculateAge(form.publishDate),
             discount: isEbook ? 10 : 5,
             pageNo: form.bookType === "Printed Book" ? form.pageNo : 0,
             ebookSize: form.bookType === "Ebook" ? form.ebookSize : 0
         };
 
-        if (editIndex !== null) {
-            dispatch(updateBook({ index: editIndex, book: updatedBook }));
-            setEditIndex(null);
-        } else {
-            dispatch(addBook(updatedBook));
+        try {
+            if (editId !== null) {
+
+                const response = await fetch(`http://localhost:3000/api/books/${editId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedBook)
+                });
+
+                if (response.ok) {
+                    const savedBook = await response.json();
+                    dispatch(updateBook(savedBook));
+                    setEditId(null);
+                } else {
+                    alert("Failed to update book on server.");
+                }
+            } else {
+
+                const response = await fetch('http://localhost:3000/api/books', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedBook)
+                });
+
+                if (response.ok) {
+                    const newDbBook = await response.json();
+                    dispatch(addBook(newDbBook));
+                } else {
+                    alert("Failed to save book to server.");
+                }
+            }
+            setForm(initialFormState);
+        } catch (error) {
+            console.error("Network error saving book:", error);
+            alert("Could not connect to the server.");
         }
-        setForm(initialFormState);
+    };
+
+
+    const handleDelete = async (id: number) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/books/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                dispatch(deleteBook(id));
+            } else {
+                alert("Failed to delete book from server.");
+            }
+        } catch (error) {
+            console.error("Network error deleting book:", error);
+            alert("Could not connect to the server.");
+        }
     };
 
     const filteredBooks = books.filter(book =>
@@ -73,7 +153,7 @@ function BookForm() {
         <div className="formContainer">
 
             <form className="bookSubmitForm" onSubmit={(e: SubmitEvent) => { e.preventDefault(); handleSaveProcess(); }}>
-                <h1>{editIndex !== null ? "Edit Book" : "Book Entry Form"}</h1>
+                <h1>{editId !== null ? "Edit Book" : "Book Entry Form"}</h1>
                 <hr /><br />
 
                 <label>Title:</label>
@@ -121,7 +201,7 @@ function BookForm() {
                 <input type="number" name="price" className="inputBox" value={form.price} onChange={handleChange} onKeyDown={blockInvalidChar} min="0" />
                 <br /><br />
 
-                <button type="submit" className="addToLibrary">{editIndex !== null ? "Update Book" : "Submit"}</button>
+                <button type="submit" className="addToLibrary">{editId !== null ? "Update Book" : "Submit"}</button>
             </form>
 
             <div className="libraryContainer">
@@ -161,29 +241,32 @@ function BookForm() {
                     </thead>
                     <tbody>
                     {filteredBooks.map((book) => {
-                        const originalIndex = books.findIndex(b => b === book);
                         return (
-                            <tr key={originalIndex}>
-                                <td>{originalIndex + 1}</td>
-                                <td>{book.bookName}</td>
-                                <td>{book.author}</td>
-                                <td>{book.isbn}</td>
-                                <td>{book.publishDate}</td>
-                                <td>{book.age}</td>
-                                <td>{book.genre}</td>
-                                <td>{book.bookType === "Printed Book" ? book.pageNo : "-"}</td>
-                                <td>{book.bookType === "Ebook" ? book.ebookSize : "-"}</td>
-                                <td>₹{book.price}</td>
-                                <td>{book.discount}%</td>
-                                <td>₹{disPrice(book.price, book.discount)}</td>
-                                <td><button onClick={() => { setForm({ ...book }); setEditIndex(originalIndex); }}>Edit</button></td>
-                                <td><button onClick={() => dispatch(deleteBook(originalIndex))}>Delete</button></td>
-                            </tr>
-                        );
+                        <tr key={book.id}>
+                            <td>{book.id}</td>
+                            <td>{book.bookName}</td>
+                            <td>{book.author}</td>
+                            <td>{book.isbn}</td>
+                            <td>{book.publishDate}</td>
+                            <td>{book.age}</td>
+                            <td>{book.genre}</td>
+                            <td>{book.bookType === "Printed Book" ? book.pageNo : "-"}</td>
+                            <td>{book.bookType === "Ebook" ? book.ebookSize : "-"}</td>
+                            <td>₹{book.price}</td>
+                            <td>{book.discount}%</td>
+                            <td>₹{disPrice(book.price, book.discount)}</td>
+
+                            {/* Updated to use book.id */}
+                            <td><button onClick={() => { setForm({ ...book }); setEditId(book.id); }}>Edit</button></td>
+
+                            {/* Updated to call the API delete function */}
+                            <td><button onClick={() => handleDelete(book.id)}>Delete</button></td>
+                        </tr>
+                    );
                     })}
                     </tbody>
                 </table>
-                {editIndex !== null && (
+                {editId !== null && (
                     <button id="saveEdit" onClick={handleSaveProcess} style={{ marginTop: '10px' }}>Save edit</button>
                 )}
             </div>

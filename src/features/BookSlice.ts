@@ -1,37 +1,41 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Books } from '../types/Books';
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { Books } from "../types/Books"; 
 
-interface BooksState {
+
+interface LibraryState {
     books: Books[];
 }
 
-const initialState: BooksState = {
+const initialState: LibraryState = {
     books: [],
 };
 
-export const booksSlice = createSlice({
-    name: 'books',
+const bookSlice = createSlice({
+    name: "library",
     initialState,
     reducers: {
-        // Adds a new book to the array
+      
+        setAllBooks: (state, action: PayloadAction<Books[]>) => {
+            state.books = action.payload;
+        },
+
+        
         addBook: (state, action: PayloadAction<Books>) => {
             state.books.push(action.payload);
         },
-        // Finds a book by index and replaces it
-        updateBook: (state, action: PayloadAction<{ index: number; book: Books }>) => {
-            if (state.books[action.payload.index]) {
-                state.books[action.payload.index] = action.payload.book;
+
+        updateBook: (state, action: PayloadAction<Books>) => {
+            const index = state.books.findIndex(book => book.id === action.payload.id);
+            if (index !== -1) {
+                state.books[index] = action.payload;
             }
         },
-        // Removes a book by its index
+
         deleteBook: (state, action: PayloadAction<number>) => {
-            state.books = state.books.filter((_, i) => i !== action.payload);
+            state.books = state.books.filter(book => book.id !== action.payload);
         },
     },
 });
+export const { setAllBooks, addBook, updateBook, deleteBook, } = bookSlice.actions;
 
-// Export the actions so we can use them in the Form
-export const { addBook, updateBook, deleteBook } = booksSlice.actions;
-
-// Export the reducer for the store
-export default booksSlice.reducer;
+export default bookSlice.reducer;

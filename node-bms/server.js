@@ -1,47 +1,58 @@
-import req from "express/lib/request";
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const port = 3000;
 
-const express =require('express');
-const app=express();
-const port=3000;
-import Books from "src/types/Books.js"
 
+app.use(cors());
 app.use(express.json());
 
-const {bookName, author, isbn, publishDate, age, pageNo, ebookSize, genre, price, discount, bookType}=req.body;
-const newBook = {
-    id: Books.length + 1,
-    bookName,
-    author,
-    isbn,
-    publishDate,
-    bookType,
-    genre,
-    price,
-    discount,
-    age: new Date().getFullYear() - new Date(publishDate).getFullYear(),
-    pageNo,
-    ebookSize
 
-};
+app.use((req, res, next) => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${req.method} request to ${req.url}`);
+    next();
+});
 
-app.get("/",(req,res)=>{
+
+let books = [
+    // {
+    //     id: 1,
+    //     bookName: "The Great Gatsby",
+    //     author: "F. Scott Fitzgerald",
+    //     publishDate: "1925-04-10",
+    //     price: 10.99
+    // },
+    // {
+    //     id: 2,
+    //     bookName: "The Jungle Book",
+    //     author: "J.K. Rowling",
+    //     publishDate: "1980-04-10",
+    //     price: 20.99
+    // }
+];
+
+
+app.get("/", (req, res) => {
     res.send("Backend BMS");
 });
 
-app.get("/books",(req,res)=>{
-res.status(200).json(books)
+
+app.get("/api/books", (req, res) => {
+    res.status(200).json(books);
 });
 
 
-
 app.post('/api/books', (req, res) => {
+    const { id, ...bookData } = req.body;
     const newBook = {
         id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
-        ...req.body
+        ...bookData
     };
     books.push(newBook);
     res.status(201).json(newBook);
 });
+
 
 app.put('/api/books/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -59,7 +70,7 @@ app.put('/api/books/:id', (req, res) => {
 app.delete('/api/books/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const initialLength = books.length;
-    Books = Books.filter(b => b.id !== id);
+    books = books.filter(b => b.id !== id);
 
     if (books.length < initialLength) {
         res.status(200).json({ message: "Book deleted successfully" });
@@ -69,7 +80,7 @@ app.delete('/api/books/:id', (req, res) => {
 });
 
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
     console.error(`[ERROR]: ${err.message}`);
     res.status(500).json({
         status: "error",
@@ -77,17 +88,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-app.use((req, res, next) => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] ${req.method} request to ${req.url}`);
-    next();
-});
-
-app.listen(port,()=>{
-    console.log(`Server is running on port ${port}`);
+// --- START SERVER ---
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });
