@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const pool = require('./db'); // 1. Import your database connection
+const corsOptions = require('./config/corsOptions');
 const app = express();
 const port = 3000;
 
-
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
-
 
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -15,80 +15,75 @@ app.use((req, res, next) => {
 });
 
 
-let books = [
-    // {
-    //     id: 1,
-    //     bookName: "The Great Gatsby",
-    //     author: "F. Scott Fitzgerald",
-    //     publishDate: "1925-04-10",
-    //     price: 10.99
-    // },
-    // {
-    //     id: 2,
-    //     bookName: "The Jungle Book",
-    //     author: "J.K. Rowling",
-    //     publishDate: "1980-04-10",
-    //     price: 20.99
-    // }
-];
+app.get("/api/books", async (req, res) => {
+    try {
 
+        const allBooks = await pool.query("SELECT * FROM books");
 
-app.get("/", (req, res) => {
-    res.send("Backend BMS");
+        res.status(200).json(allBooks.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Server error" });
+    }
 });
 
+app.post('/api/books', async (req, res) => {
+    try {
+        const { bookName, author, isbn, publishDate, bookType, pageNo, ebookSize, genre, price, discount, age } = req.body;
 
-app.get("/api/books", (req, res) => {
-    res.status(200).json(books);
+        const newBook = await pool.query(
+            `INSERT INTO books ("bookName", author, isbn, "publishDate", age,"bookType", "pageNo", "ebookSize", genre, price, discount) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+            [bookName, author, isbn, publishDate, age, bookType, pageNo, ebookSize, genre, price, discount]
+        );
+
+        res.status(201).json(newBook.rows[0]);
+    } catch (err) {
+        console.error("Database Insert Error:", err.message);
+        res.status(500).json({ error: "Server error" });
+    }
 });
 
+app.put('/api/books/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { bookName, author, isbn, publishDate, bookType, pageNo, ebookSize, genre, price, discount, age } = req.body;
 
-app.post('/api/books', (req, res) => {
-    const { id, ...bookData } = req.body;
-    const newBook = {
-        id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
-        ...bookData
-    };
-    books.push(newBook);
-    res.status(201).json(newBook);
-});
+        const updateBook = await pool.query(
+            `UPDATE books 
+             SET "bookName" = $1, author = $2, isbn = $3, "publishDate" = $4, "bookType" = $5, "pageNo" = $6, "ebookSize" = $7, genre = $8, price = $9, discount = $10, age = $11 
+             WHERE id = $12 RETURNING *`,
+            [bookName, author, isbn, publishDate, bookType, pageNo, ebookSize, genre, price, discount, age, id]
+        );
 
+        if (updateBook.rows.length === 0) {
+            return res.status(404).json({ message: "Book not found" });
+        }
 
-app.put('/api/books/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = books.findIndex(b => b.id === id);
-
-    if (index !== -1) {
-        books[index] = { ...books[index], ...req.body, id };
-        res.status(200).json(books[index]);
-    } else {
-        res.status(404).json({ message: "Cannot update: Book not found" });
+        res.status(200).json(updateBook.rows[0]);
+    } catch (err) {
+        console.error("Database Update Error:", err.message);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
 
-app.delete('/api/books/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const initialLength = books.length;
-    books = books.filter(b => b.id !== id);
+app.delete('/api/books/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleteBook = await pool.query("DELETE FROM books WHERE id = $1 RETURNING *", [id]);
 
-    if (books.length < initialLength) {
+        if (deleteBook.rows.length === 0) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
         res.status(200).json({ message: "Book deleted successfully" });
-    } else {
-        res.status(404).json({ message: "Cannot delete: Book not found" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
-
-app.use((err, req, res, _next) => {
-    console.error(`[ERROR]: ${err.message}`);
-    res.status(500).json({
-        status: "error",
-        message: "Internal Server Error"
-    });
-});
-
-// --- START SERVER ---
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
