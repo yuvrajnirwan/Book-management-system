@@ -30,11 +30,20 @@ app.get("/api/books", async (_req: Request, res: Response) => {
 
 app.post('/api/books', async (req: Request, res: Response) => {
     try {
+        // 1. Log the incoming request body to ensure data is actually reaching the server
+        console.log("Incoming Book Data:", req.body);
+
         const newBook = await Book.create(req.body);
         res.status(201).json(newBook);
     } catch (err: any) {
-        console.error("Database Insert Error:", err.message);
-        res.status(500).json({ error: "Server error" });
+        // 2. Log the FULL error object, not just err.message
+        console.error("Database Insert Error:", err);
+
+        // Temporarily send the error back to the client so you can see it easily
+        res.status(500).json({
+            error: "Server error",
+            details: err.errors?.map((e: any) => e.message) || err.message
+        });
     }
 });
 
