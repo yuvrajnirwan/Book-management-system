@@ -9,7 +9,9 @@ const config = {
   port: 5432,
   user: 'yuvraj',
   password: 'yuvi',
-  database: 'books_system'
+  database: 'books_system',
+  schema: 'book_management'
+
 };
 
 // Observe application's life cycle to disconnect the datasource when

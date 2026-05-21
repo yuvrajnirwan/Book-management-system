@@ -1,5 +1,7 @@
 import {ApplicationConfig, BmsApplication} from './application';
-
+import * as dotenv from 'dotenv';
+export * from './strategies/basic.strategy';
+dotenv.config();
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {

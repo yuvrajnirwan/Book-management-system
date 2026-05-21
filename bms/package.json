@@ -49,13 +49,24 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^12.0.14",
+    "@loopback/authentication-jwt": "^0.16.14",
     "@loopback/boot": "^8.0.12",
     "@loopback/core": "^7.0.11",
     "@loopback/repository": "^8.0.11",
     "@loopback/rest": "^15.0.12",
     "@loopback/rest-explorer": "^8.0.12",
+    "@loopback/security": "^0.12.13",
     "@loopback/service-proxy": "^8.0.11",
+    "@react-oauth/google": "^0.13.5",
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "google-auth-library": "^10.6.2",
     "loopback-connector-postgresql": "^7.2.3",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
