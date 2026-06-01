@@ -1,4 +1,6 @@
 import {inject} from '@loopback/core';
+import {authenticate, STRATEGY} from 'loopback4-authentication';
+import {authorize} from 'loopback4-authorization';
 import {
   Request,
   RestBindings,

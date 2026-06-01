@@ -179,11 +179,11 @@ function BookForm() {
                 <br /><br />
 
                 <label>Publication Date:</label>
-                <input type="date" name="publishDate" className="inputBox" value={form.publishDate} onChange={handleChange} />
+                <input type="date"  name="publishDate" className="inputBox" value={form.publishDate} onChange={handleChange} />
                 <br /><br />
 
                 <label>Book Type:</label>
-                <select name="bookType" value={form.bookType} onChange={handleChange}>
+                <select className="inputBox" name="bookType" value={form.bookType} onChange={handleChange}>
                     <option value="" disabled hidden>Select type</option>
                     <option value="Printed Book">Printed Book</option>
                     <option value="Ebook">Ebook</option>
@@ -199,7 +199,7 @@ function BookForm() {
                 )}
 
                 <label>Genre:</label>
-                <select name="genre" value={form.genre} onChange={handleChange}>
+                <select name="genre" className="inputBox" value={form.genre} onChange={handleChange}>
                     <option value="" disabled hidden>Select a genre</option>
                     <option value="fiction">Fiction</option>
                     <option value="non-fiction">Non-fiction</option>
@@ -221,7 +221,7 @@ function BookForm() {
                 <table className="libraryTable">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>S.No</th>
                         <th>Title</th>
                         <th>Author</th>
                         <th>ISBN</th>
@@ -250,10 +250,10 @@ function BookForm() {
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredBooks.map((book) => {
+                    {filteredBooks.map((book, index) => {
                         return (
                         <tr key={book.id}>
-                            <td>{book.id}</td>
+                            <td>{index + 1}</td>
                             <td>{book.bookName}</td>
                             <td>{book.author}</td>
                             <td>{book.isbn}</td>

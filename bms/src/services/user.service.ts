@@ -1,4 +1,4 @@
-import {UserService} from '@loopback/authentication';
+// import {UserService} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
@@ -7,7 +7,7 @@ import {User, UserCredentials} from '../models';
 import {UserRepository, UserCredentialsRepository} from '../repositories';
 import {PasswordHasher} from './hash.password.service';
 
-export class MyUserService implements UserService<User, {email: string; password: string}> {
+export class MyUserService {
   constructor(
     @repository(UserRepository) public userRepository: UserRepository,
     @repository(UserCredentialsRepository) public userCredentialsRepository: UserCredentialsRepository,

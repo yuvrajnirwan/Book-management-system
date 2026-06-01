@@ -1,4 +1,4 @@
-import {TokenService} from '@loopback/authentication';
+// import {TokenService} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
@@ -16,7 +16,7 @@ export interface UserProfileWithToken extends UserProfile {
   token?: string;
 }
 
-export class JwtService implements TokenService {
+export class JwtService {
   constructor(
     @inject('authentication.jwt.secret')
     private readonly secret: string,

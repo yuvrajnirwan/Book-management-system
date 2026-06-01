@@ -17,6 +17,8 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {authenticate, STRATEGY} from 'loopback4-authentication';
+import {authorize} from 'loopback4-authorization';
 import {Book} from '../models';
 import {BookRepository} from '../repositories';
 
@@ -27,6 +29,8 @@ export class BooksController {
   ) {}
 
   @post('/books')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Books model instance',
     content: {'application/json': {schema: getModelSchemaRef(Book)}},
@@ -48,6 +52,8 @@ export class BooksController {
   }
 
   @get('/books/count')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Books model count',
     content: {'application/json': {schema: CountSchema}},
@@ -59,6 +65,8 @@ export class BooksController {
   }
 
   @get('/books')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Array of Books model instances',
     content: {
@@ -77,6 +85,8 @@ export class BooksController {
   }
 
   @patch('/books')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Books PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -96,6 +106,8 @@ export class BooksController {
   }
 
   @get('/books/{id}')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Books model instance',
     content: {
@@ -112,6 +124,8 @@ export class BooksController {
   }
 
   @patch('/books/{id}')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(204, {
     description: 'Books PATCH success',
   })
@@ -130,6 +144,8 @@ export class BooksController {
   }
 
   @put('/books/{id}')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(204, {
     description: 'Books PUT success',
   })
@@ -141,6 +157,8 @@ export class BooksController {
   }
 
   @del('/books/{id}')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(204, {
     description: 'Books DELETE success',
   })

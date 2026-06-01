@@ -6,6 +6,8 @@ import {
   get,
   getModelSchemaRef,
 } from '@loopback/rest';
+import {authenticate, STRATEGY} from 'loopback4-authentication';
+import {authorize} from 'loopback4-authorization';
 import {
   UserCredentials,
   User,
@@ -30,6 +32,8 @@ export class UserCredentialsUserController {
       },
     },
   })
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   async getUser(
     @param.path.string('id') id: typeof UserCredentials.prototype.userId,
   ): Promise<User> {

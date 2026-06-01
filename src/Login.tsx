@@ -45,7 +45,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
         setLoading(true);
 
         try {
-            const response = await fetch('http://127.0.0.1:3000/users/login', {
+            const response = await fetch('http://localhost:3000/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,10 +90,10 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
         try {
             // Ensure the credential payload string exists before hitting your backend API
             if (!credentialResponse.credential) {
-                throw new Error('Google did not return a valid authentication token token.');
+                throw new Error('Google did not return a valid authentication token.');
             }
 
-            const response = await fetch('http://127.0.0.1:3000/users/google-login', {
+            const response = await fetch('http://localhost:3000/users/google-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import {inject} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {
   post,
@@ -8,7 +8,8 @@ import {
   get,
   param,
 } from '@loopback/rest';
-import {authenticate} from '@loopback/authentication';
+import {authenticate, STRATEGY} from 'loopback4-authentication';
+import {authorize} from 'loopback4-authorization';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {OAuth2Client} from 'google-auth-library'; // 1. Imported Google OAuth Client
 import {User, UserCredentials} from '../models';
@@ -24,12 +25,14 @@ export class UserController {
   constructor(
     @repository(UserRepository) private userRepository: UserRepository,
     @repository(UserCredentialsRepository) private userCredentialsRepository: UserCredentialsRepository,
-    @inject('services.jwt.service') private jwtService: JwtService,
+    // @inject('services.jwt.service') private jwtService: JwtService,
+    @service(JwtService) private jwtService: JwtService,
     @inject('services.hash.password') private passwordHasher: BcryptHasher,
     @inject('services.user.service') private userService: MyUserService,
   ) {}
 
   @post('/users/register')
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'User registered successfully',
     content: {
@@ -92,6 +95,7 @@ export class UserController {
   }
 
   @post('/users/login')
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Login successful',
     content: {
@@ -132,6 +136,7 @@ export class UserController {
 
   // 3. Added Google Identity Integration Endpoint
   @post('/users/google-login')
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Google SSO Login Successful',
     content: {
@@ -208,7 +213,8 @@ export class UserController {
   }
 
   @post('/users/login-basic')
-  @authenticate('basic')
+  @authenticate(STRATEGY.LOCAL)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Login successful with basic auth',
     content: {
@@ -231,7 +237,8 @@ export class UserController {
   }
 
   @get('/users/me')
-  @authenticate('jwt', 'basic')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Current user profile',
   })
@@ -242,7 +249,8 @@ export class UserController {
   }
 
   @get('/users/{id}')
-  @authenticate('jwt', 'basic')
+  @authenticate(STRATEGY.BEARER)
+  @authorize({permissions: ['*']})
   @response(200, {
     description: 'Get user by ID',
   })

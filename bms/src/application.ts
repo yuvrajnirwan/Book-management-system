@@ -9,12 +9,22 @@ import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
-import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
-import {JWTAuthenticationStrategy} from '@loopback/authentication-jwt';
-import {BasicAuthenticationStrategy} from './strategies';
+import {AuthenticationComponent} from 'loopback4-authentication';
+import {AuthenticationServiceComponent} from '@sourceloop/authentication-service';
+import {
+  BearerVerifierBindings,
+  BearerVerifierComponent,
+  BearerVerifierConfig,
+  BearerVerifierType,
+} from '@sourceloop/core';
+import {AuthorizationComponent, AuthorizationBindings} from 'loopback4-authorization';
+// import {BasicAuthenticationStrategy} from './strategies'; // We will update this or use SourceFuse's
 import {JwtService} from './services';
 import {BcryptHasher} from './services';
 import {MyUserService} from './services';
+import {AuthenticationBindings, Strategies, STRATEGY} from 'loopback4-authentication';
+import {LocalPasswordVerifyProvider} from './providers/local-password-verify.provider';
+import {BearerTokenVerifyProvider} from './providers/bearer-token-verify.provider';
 
 export {ApplicationConfig};
 
@@ -24,14 +34,7 @@ export class BmsApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-    this.restServer.config.cors = {
-      origin: '*',
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-      maxAge: 86400,
-      credentials: true,
-    };
+
 
     this.sequence(MySequence);
 
@@ -42,27 +45,72 @@ export class BmsApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
 
-    // Add authentication component
+    // Bind authorization configuration
+    this.bind(AuthorizationBindings.CONFIG).to({
+      allowAlwaysPaths: ['/explorer'],
+    });
+
     this.component(AuthenticationComponent);
-    registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
-    registerAuthenticationStrategy(this, BasicAuthenticationStrategy);
+    // this.component(AuthenticationServiceComponent);
+
+    /*
+    this.bind(BearerVerifierBindings.Config).to({
+      type: BearerVerifierType.service,
+      useSymmetricEncryption: true,
+    } as BearerVerifierConfig);
+    this.component(BearerVerifierComponent);
+    */
+
+    this.component(AuthorizationComponent);
+
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: 'bms',
+        version: '1.0.0',
+      },
+      paths: {},
+      components: {
+        securitySchemes: {
+          [STRATEGY.BEARER]: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
+      security: [
+        {
+          [STRATEGY.BEARER]: [],
+        },
+      ],
+      servers: [{url: '/'}],
+    });
+
+    // Bind local password verify provider
+    this.bind(Strategies.Passport.LOCAL_PASSWORD_VERIFIER).toProvider(
+      LocalPasswordVerifyProvider,
+    );
+    this.bind(Strategies.Passport.BEARER_TOKEN_VERIFIER).toProvider(
+      BearerTokenVerifyProvider,
+    );
 
     // Bind JWT secret and services
     this.bind('authentication.jwt.secret').to(
-      process.env.JWT_SECRET || 'your-secret-key-change-this',
+      process.env.JWT_SECRET || 'your-fallback-secret-here-for-local-dev'
     );
     this.bind('authentication.jwt.expiresIn').to('24h');
     this.bind('rounds').to(10);
 
-    this.bind('services.jwt.service').toClass(JwtService);
+    // this.bind('services.jwt.service').toClass(JwtService);
     this.bind('services.user.service').toClass(MyUserService);
     this.bind('services.hash.password').toClass(BcryptHasher);
 
     // Bind JWT token service for authentication strategy
-    this.bind('services.authentication.jwt.tokenservice').toClass(JwtService);
+    // this.bind('services.authentication.jwt.tokenservice').toClass(JwtService);
     this.bind(RestBindings.ERROR_WRITER_OPTIONS).to({debug: true});
     this.configure('rest.cors').to({
-      origin: ['http://localhost:5173'], // Your React App URL
+      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'], // Your React App URL
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
