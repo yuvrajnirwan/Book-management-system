@@ -64,9 +64,10 @@ export class BooksController {
     return this.booksRepository.count(where);
   }
 
-  @get('/books')
+
   @authenticate(STRATEGY.BEARER)
-  @authorize({permissions: ['*']})
+  // @authorize({permissions: ['*']})
+  @get('/books')
   @response(200, {
     description: 'Array of Books model instances',
     content: {

@@ -35,7 +35,12 @@ function BookForm() {
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const response = await fetch('http://localhost:3000/books');
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:3000/books', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     dispatch(setAllBooks(data));
@@ -81,30 +86,27 @@ function BookForm() {
 
         const isEbook = form.bookType === "Ebook";
         const currentDiscount = isEbook ? 10 : 5;
-
-        // Calculate finalPrice here so the backend receives it
         const calculatedFinalPrice = disPrice(form.price, currentDiscount);
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { id, ...rest } = form;
-
         const updatedBook = {
-            ...rest,
-            finalPrice: calculatedFinalPrice, // <--- ADD THIS LINE
+            ...form,
+            finalPrice: calculatedFinalPrice,
             age: calculateAge(form.publishDate),
             discount: currentDiscount,
             pageNo: form.bookType === "Printed Book" ? form.pageNo : 0,
             ebookSize: form.bookType === "Ebook" ? form.ebookSize : 0
         };
 
-
+        const token = localStorage.getItem('token');
 
         try {
             if (editId !== null) {
-
                 const response = await fetch(`http://localhost:3000/books/${editId}`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(updatedBook)
                 });
 
@@ -116,10 +118,12 @@ function BookForm() {
                     alert("Failed to update book on server.");
                 }
             } else {
-
                 const response = await fetch('http://localhost:3000/books', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify(updatedBook)
                 });
 
@@ -140,8 +144,12 @@ function BookForm() {
 
     const handleDelete = async (id: number) => {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:3000/books/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.ok) {
@@ -252,27 +260,27 @@ function BookForm() {
                     <tbody>
                     {filteredBooks.map((book, index) => {
                         return (
-                        <tr key={book.id}>
-                            <td>{index + 1}</td>
-                            <td>{book.bookName}</td>
-                            <td>{book.author}</td>
-                            <td>{book.isbn}</td>
-                            <td>{book.publishDate}</td>
-                            <td>{book.age}</td>
-                            <td>{book.genre}</td>
-                            <td>{book.bookType === "Printed Book" ? book.pageNo : "-"}</td>
-                            <td>{book.bookType === "Ebook" ? book.ebookSize : "-"}</td>
-                            <td>₹{book.price}</td>
-                            <td>{book.discount}%</td>
-                            <td>₹{disPrice(book.price, book.discount)}</td>
+                            <tr key={book.id}>
+                                <td>{index + 1}</td>
+                                <td>{book.bookName}</td>
+                                <td>{book.author}</td>
+                                <td>{book.isbn}</td>
+                                <td>{book.publishDate}</td>
+                                <td>{book.age}</td>
+                                <td>{book.genre}</td>
+                                <td>{book.bookType === "Printed Book" ? book.pageNo : "-"}</td>
+                                <td>{book.bookType === "Ebook" ? book.ebookSize : "-"}</td>
+                                <td>₹{book.price}</td>
+                                <td>{book.discount}%</td>
+                                <td>₹{disPrice(book.price, book.discount)}</td>
 
-                            {/* Updated to use book.id */}
-                            <td><button onClick={() => { setForm({ ...book }); setEditId(book.id); }}>Edit</button></td>
+                                {/* Updated to use book.id */}
+                                <td><button onClick={() => { setForm({ ...book }); setEditId(book.id); }}>Edit</button></td>
 
-                            {/* Updated to call the API delete function */}
-                            <td><button onClick={() => handleDelete(book.id)}>Delete</button></td>
-                        </tr>
-                    );
+                                {/* Updated to call the API delete function */}
+                                <td><button onClick={() => handleDelete(book.id)}>Delete</button></td>
+                            </tr>
+                        );
                     })}
                     </tbody>
                 </table>

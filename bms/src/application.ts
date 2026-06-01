@@ -10,15 +10,7 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 import {AuthenticationComponent} from 'loopback4-authentication';
-import {AuthenticationServiceComponent} from '@sourceloop/authentication-service';
-import {
-  BearerVerifierBindings,
-  BearerVerifierComponent,
-  BearerVerifierConfig,
-  BearerVerifierType,
-} from '@sourceloop/core';
 import {AuthorizationComponent, AuthorizationBindings} from 'loopback4-authorization';
-// import {BasicAuthenticationStrategy} from './strategies'; // We will update this or use SourceFuse's
 import {JwtService} from './services';
 import {BcryptHasher} from './services';
 import {MyUserService} from './services';
@@ -34,8 +26,6 @@ export class BmsApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-
-
     this.sequence(MySequence);
 
     this.static('/', path.join(__dirname, '../public'));
@@ -45,22 +35,20 @@ export class BmsApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
 
-    // Bind authorization configuration
+    // Bind authorization configuration - ONLY public endpoints here
     this.bind(AuthorizationBindings.CONFIG).to({
-      allowAlwaysPaths: ['/explorer'],
+      allowAlwaysPaths: [
+        '/explorer',
+        '/users/register',
+        '/users/login',
+        '/users/google-login',
+      ],
     });
 
+    // Register authentication component
     this.component(AuthenticationComponent);
-    // this.component(AuthenticationServiceComponent);
 
-    /*
-    this.bind(BearerVerifierBindings.Config).to({
-      type: BearerVerifierType.service,
-      useSymmetricEncryption: true,
-    } as BearerVerifierConfig);
-    this.component(BearerVerifierComponent);
-    */
-
+    // Register authorization component
     this.component(AuthorizationComponent);
 
     this.api({
@@ -87,7 +75,7 @@ export class BmsApplication extends BootMixin(
       servers: [{url: '/'}],
     });
 
-    // Bind local password verify provider
+    // Bind authentication providers
     this.bind(Strategies.Passport.LOCAL_PASSWORD_VERIFIER).toProvider(
       LocalPasswordVerifyProvider,
     );
@@ -95,25 +83,26 @@ export class BmsApplication extends BootMixin(
       BearerTokenVerifyProvider,
     );
 
-    // Bind JWT secret and services
+    // Bind JWT configuration
     this.bind('authentication.jwt.secret').to(
       process.env.JWT_SECRET || 'your-fallback-secret-here-for-local-dev'
     );
     this.bind('authentication.jwt.expiresIn').to('24h');
     this.bind('rounds').to(10);
 
-    // this.bind('services.jwt.service').toClass(JwtService);
+    // Bind services - CRITICAL FOR AUTHENTICATION
+    this.bind('services.jwt.service').toClass(JwtService);
     this.bind('services.user.service').toClass(MyUserService);
     this.bind('services.hash.password').toClass(BcryptHasher);
 
-    // Bind JWT token service for authentication strategy
-    // this.bind('services.authentication.jwt.tokenservice').toClass(JwtService);
     this.bind(RestBindings.ERROR_WRITER_OPTIONS).to({debug: true});
+
     this.configure('rest.cors').to({
-      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'], // Your React App URL
+      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
+
     this.projectRoot = __dirname;
     this.bootOptions = {
       controllers: {

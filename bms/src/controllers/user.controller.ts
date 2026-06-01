@@ -1,4 +1,4 @@
-import {inject, service} from '@loopback/core';
+import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {
   post,
@@ -25,8 +25,7 @@ export class UserController {
   constructor(
     @repository(UserRepository) private userRepository: UserRepository,
     @repository(UserCredentialsRepository) private userCredentialsRepository: UserCredentialsRepository,
-    // @inject('services.jwt.service') private jwtService: JwtService,
-    @service(JwtService) private jwtService: JwtService,
+    @inject('services.jwt.service') private jwtService: JwtService,
     @inject('services.hash.password') private passwordHasher: BcryptHasher,
     @inject('services.user.service') private userService: MyUserService,
   ) {}
