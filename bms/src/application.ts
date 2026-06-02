@@ -10,7 +10,12 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 import {AuthenticationComponent} from 'loopback4-authentication';
-import {AuthorizationComponent, AuthorizationBindings} from 'loopback4-authorization';
+// IMPORT ADDED: Brought in UserPermissionsProvider
+import {
+  AuthorizationComponent,
+  AuthorizationBindings,
+  UserPermissionsProvider
+} from 'loopback4-authorization';
 import {JwtService} from './services';
 import {BcryptHasher} from './services';
 import {MyUserService} from './services';
@@ -39,6 +44,7 @@ export class BmsApplication extends BootMixin(
     this.bind(AuthorizationBindings.CONFIG).to({
       allowAlwaysPaths: [
         '/explorer',
+        '/ping',
         '/users/register',
         '/users/login',
         '/users/google-login',
@@ -50,6 +56,11 @@ export class BmsApplication extends BootMixin(
 
     // Register authorization component
     this.component(AuthorizationComponent);
+
+    // Bind the UserPermissionsProvider so the app knows HOW to authorize
+    this.bind(AuthorizationBindings.USER_PERMISSIONS).toProvider(
+      UserPermissionsProvider,
+    );
 
     this.api({
       openapi: '3.0.0',

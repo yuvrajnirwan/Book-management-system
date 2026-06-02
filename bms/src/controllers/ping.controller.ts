@@ -41,8 +41,8 @@ const PING_RESPONSE: ResponseObject = {
  */
 export class PingController {
   constructor(@inject(RestBindings.Http.REQUEST) private req: Request) {}
-  @authenticate(STRATEGY.BEARER)
-  @authorize({permissions: ['*']})
+  // @authenticate(STRATEGY.BEARER)
+  // @authorize({permissions: ['*']})
   // Map to `GET /ping`
   @get('/ping')
   @response(200, PING_RESPONSE)

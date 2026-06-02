@@ -66,7 +66,7 @@ export class BooksController {
 
 
   @authenticate(STRATEGY.BEARER)
-  // @authorize({permissions: ['*']})
+  @authorize({permissions: ['*']})
   @get('/books')
   @response(200, {
     description: 'Array of Books model instances',
