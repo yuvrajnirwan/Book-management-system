@@ -43,6 +43,7 @@ export class BmsApplication extends BootMixin(
     // Bind authorization configuration - ONLY public endpoints here
     this.bind(AuthorizationBindings.CONFIG).to({
       allowAlwaysPaths: [
+        '/openapi.json',
         '/explorer',
         '/ping',
         '/users/register',
